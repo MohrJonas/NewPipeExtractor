@@ -30,10 +30,7 @@ public final class TwitchClipLinkHandlerFactory extends TwitchBaseLinkHandlerFac
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        final var twitchId = TwitchClipId.fromString(id);
-        return twitchId.getStreamerName() == null
-            ? "https://clips.twitch.tv/" + twitchId.getClipId()
-            : buildUrl(twitchId.getStreamerName(), "clip", twitchId.getClipId());
+        return new TwitchClipId(id).toString();
     }
 
     @Override

@@ -12,11 +12,16 @@ import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.TwitchResponseParser;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.nowLive.TwitchNowLiveResponse;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchPlaybackTokenResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchStreamPlaybackTokenResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchVodPlaybackTokenResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchVodPlaybackTokenResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.TwitchSearchResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponse;
-import org.schabi.newpipe.extractor.services.twitch.graphql.TwitchQGLTemplates;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.vod.TwitchVodResponse;
+import org.schabi.newpipe.extractor.services.twitch.graphql.TwitchGQLTemplates;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -39,8 +44,8 @@ public final class TwitchApi {
 
     public static TwitchSearchResponse getSearchResponse(final Downloader downloader, final String query) throws IOException, ReCaptchaException, JsonParserException {
         final var requestId = UUID.randomUUID().toString();
-        final var rawRequest = TwitchQGLTemplates.getSearchResult(requestId, query);
-        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchQGLTemplates.getSearchResult(requestId, query)));
+        final var rawRequest = TwitchGQLTemplates.getSearchResult(requestId, query);
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getSearchResult(requestId, query)));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
         final var response = TwitchResponseParser.parseFromJson(JsonParser.array().from(rawResponse.responseBody()).getObject(0), TwitchSearchResponse.class);
@@ -49,7 +54,7 @@ public final class TwitchApi {
     }
 
     public static TwitchNowLiveResponse getNowLiveInformation(final Downloader downloader) throws IOException, ReCaptchaException, JsonParserException {
-        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchQGLTemplates.getNowLive()));
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getNowLive()));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
         final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchNowLiveResponse.class);
@@ -58,7 +63,7 @@ public final class TwitchApi {
     }
 
     public static TwitchStreamResponse getStreamInformation(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
-        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchQGLTemplates.getStream(channelName)));
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getStream(channelName)));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
         final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchStreamResponse.class);
@@ -66,11 +71,11 @@ public final class TwitchApi {
         return response;
     }
 
-    public static TwitchPlaybackTokenResponse getPlaybackToken(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
-        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchQGLTemplates.getPlaybackAccessTokenTemplate(channelName)));
+    public static TwitchStreamPlaybackTokenResponse getPlaybackToken(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getPlaybackAccessTokenTemplate(channelName)));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
-        final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchPlaybackTokenResponse.class);
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchStreamPlaybackTokenResponse.class);
         response.ensureSuccess();
         return response;
     }
@@ -124,10 +129,19 @@ public final class TwitchApi {
     }
 
     public static TwitchChannelResponse getTwitchChannel(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
-        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchQGLTemplates.getChannel(channelName)));
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getChannel(channelName)));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
         final var response = TwitchResponseParser.parseFromJson(createJsonObjectFromArray(JsonParser.array().from(rawResponse.responseBody())), TwitchChannelResponse.class);
+        response.ensureSuccess();
+        return response;
+    }
+
+    public static TwitchVodResponse getTwitchVods(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getVods(channelName)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.array().from(rawResponse.responseBody()).getObject(0), TwitchVodResponse.class);
         response.ensureSuccess();
         return response;
     }
@@ -151,5 +165,56 @@ public final class TwitchApi {
         if(!errors.isEmpty())
             fullObject.put("errors", errors);
         return fullObject;
+    }
+
+    public static TwitchClipResponse getTwitchClips(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getClips(channelName)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.array().from(rawResponse.responseBody()).getObject(0), TwitchClipResponse.class);
+        response.ensureSuccess();
+        return response;
+    }
+
+    public static TwitchClipPlaybackResponse getClipPlaybackToken(final Downloader downloader, final String clipSlug) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getClipPlayback(clipSlug)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.array().from(rawResponse.responseBody()).getObject(0), TwitchClipPlaybackResponse.class);
+        response.ensureSuccess();
+        return response;
+    }
+
+    public static TwitchVodPlaybackTokenResponse getVodPlaybackToken(final Downloader downloader, final String vodId) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getVodPlaybackTokenTemplate(vodId)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchVodPlaybackTokenResponse.class);
+        response.ensureSuccess();
+        return response;
+    }
+
+    public static TwitchVideoStream[] getM3U8VodPlaybackUrl(final Downloader downloader, final String vodId, final String playbackTokenSignature, final String playbackTokenValue, final String sessionId) throws IOException, ReCaptchaException {
+        final var masterM3U8Url = TWITCH_USHER_URL + "/vod/v2/" + vodId + ".m3u8?acmb=eyJBcHBWZXJzaW9uIjoiMTFhYmE4MTYtZThlMi00M2MyLWJmOWUtNTNkMTNiM2EyYWEyIiwiQ2xpZW50QXBwIjoid2ViIn0%3D&allow_source=true&enable_score=true&include_unavailable=false&lang=en&multigroup_video=false&p=4876112&platform=web&player_backend=mediaplayer&play_session_id=" + sessionId + "&player_version=1.50.0-rc.4&playlist_include_framerate=true&reassignments_supported=true&sig=" + playbackTokenSignature + "&token=" + URLEncoder.encode(playbackTokenValue, Charset.defaultCharset());
+        final var response = downloader.get(masterM3U8Url);
+        final var content = response.responseBody();
+        final var lineQueue = new ArrayDeque<String>(List.of(content.split("\n")));
+        final var commentBuffer = new ArrayList<String>();
+        final var streams = new ArrayList<TwitchVideoStream>();
+        while (!lineQueue.isEmpty()) {
+            final var line = lineQueue.pop();
+            if (line.startsWith("#")) commentBuffer.add(line);
+            else {
+                final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+x\\d+)");
+                String resolution = null;
+                for (final var bufferedLine : commentBuffer) {
+                    final var matcher = resolutionPattern.matcher(bufferedLine);
+                    if (matcher.find()) resolution = matcher.group(1);
+                }
+                if (resolution != null) streams.add(new TwitchVideoStream(resolution, line));
+                commentBuffer.clear();
+            }
+        }
+        return streams.toArray(TwitchVideoStream[]::new);
     }
 }

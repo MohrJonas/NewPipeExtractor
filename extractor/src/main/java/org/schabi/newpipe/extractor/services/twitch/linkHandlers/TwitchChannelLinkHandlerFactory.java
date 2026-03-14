@@ -3,6 +3,7 @@ package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandlerFactory;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
+import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
 
 import java.util.List;
 
@@ -10,7 +11,11 @@ public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactor
 
     @Override
     public String getId(String url) throws ParsingException, UnsupportedOperationException {
-        return TwitchChannelId.fromString(url).getChannelName();
+        try {
+            return TwitchChannelId.fromString(url).getChannelName();
+        }
+        catch (AssertionError ignored) {}
+        return TwitchStreamId.fromString(url).getStreamId();
     }
 
     @Override
@@ -24,8 +29,12 @@ public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactor
             TwitchChannelId.fromString(urlString);
             return true;
         }
-        catch (AssertionError e) {
-            return false;
+        catch (AssertionError ignored) {}
+        try {
+            TwitchStreamId.fromString(urlString);
+            return true;
         }
+        catch (AssertionError ignored) {}
+        return false;
     }
 }

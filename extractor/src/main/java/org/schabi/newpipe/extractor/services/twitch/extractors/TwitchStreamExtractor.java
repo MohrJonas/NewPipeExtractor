@@ -9,7 +9,7 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchPlaybackTokenResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchStreamPlaybackTokenResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 public class TwitchStreamExtractor extends StreamExtractor {
 
     private TwitchStreamResponseInner response;
-    private TwitchPlaybackTokenResponse tokenResponse;
+    private TwitchStreamPlaybackTokenResponse tokenResponse;
     private TwitchVideoStream[] streams;
 
     public TwitchStreamExtractor(StreamingService service, LinkHandler linkHandler) {
@@ -46,7 +46,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderUrl() throws ParsingException {
-        return "https://twitch.tv/" + getUploaderName();
+        return TwitchStreamId.fromString(getUrl()).toString();
     }
 
     @Nonnull

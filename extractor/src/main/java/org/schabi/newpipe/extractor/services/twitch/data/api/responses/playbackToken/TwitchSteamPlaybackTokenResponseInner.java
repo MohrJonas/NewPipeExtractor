@@ -2,7 +2,7 @@ package org.schabi.newpipe.extractor.services.twitch.data.api.responses.playback
 
 import javax.annotation.Nonnull;
 
-public final class TwitchPlaybackTokenResponseInner {
+public final class TwitchSteamPlaybackTokenResponseInner {
 
     @Nonnull
     private final String signature;
@@ -10,7 +10,7 @@ public final class TwitchPlaybackTokenResponseInner {
     @Nonnull
     private final String value;
 
-    public TwitchPlaybackTokenResponseInner(@Nonnull String signature, @Nonnull String value) {
+    public TwitchSteamPlaybackTokenResponseInner(@Nonnull String signature, @Nonnull String value) {
         this.signature = signature;
         this.value = value;
     }

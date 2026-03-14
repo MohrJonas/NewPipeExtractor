@@ -25,7 +25,8 @@ public final class TwitchChannelResponse extends TwitchBaseResponse<TwitchChanne
                 channelShell.getObject("userOrError").getString("profileImageURL"),
                 homeOfflineCarousel.getObject("user").getString("description"),
                 channelAvatar.getObject("user").getObject("followers").getInt("totalCount"),
-                homeOfflineCarousel.getObject("user").getObject("roles").getBoolean("isPartner")
+                homeOfflineCarousel.getObject("user").getObject("roles").getBoolean("isPartner"),
+                channelShell.getObject("userOrError").get("stream") != null
         );
     }
 }

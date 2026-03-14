@@ -24,6 +24,7 @@ import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchGameId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchQueryId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
+import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -132,7 +133,8 @@ public class TwitchSearchExtractor extends SearchExtractor {
     private static StreamInfoItem buildVodInfoItem(final int serviceId, final TwitchSearchVodResponseEntry entry) {
         final var item = new StreamInfoItem(
                 serviceId,
-                new TwitchStreamId(entry.getChannelName()).toString(),
+                // FIXME this should be vodId, not vod title
+                new TwitchVodId(entry.getVodTitle()).toString(),
                 entry.getVodTitle(),
                 StreamType.POST_LIVE_STREAM
         );

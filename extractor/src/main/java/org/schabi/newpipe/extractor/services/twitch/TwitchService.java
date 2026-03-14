@@ -2,15 +2,11 @@ package org.schabi.newpipe.extractor.services.twitch;
 
 import static org.schabi.newpipe.extractor.StreamingService.ServiceInfo.MediaCapability.LIVE;
 
-import org.schabi.newpipe.extractor.Page;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.channel.ChannelExtractor;
 import org.schabi.newpipe.extractor.channel.tabs.ChannelTabExtractor;
 import org.schabi.newpipe.extractor.comments.CommentsExtractor;
-import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
-import org.schabi.newpipe.extractor.exceptions.ParsingException;
-import org.schabi.newpipe.extractor.kiosk.KioskExtractor;
 import org.schabi.newpipe.extractor.kiosk.KioskList;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandlerFactory;
@@ -21,9 +17,12 @@ import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandler;
 import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandlerFactory;
 import org.schabi.newpipe.extractor.playlist.PlaylistExtractor;
 import org.schabi.newpipe.extractor.search.SearchExtractor;
+import org.schabi.newpipe.extractor.services.twitch.data.id.TwitchId;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchChannelExtractor;
+import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchClipExtractor;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchSearchExtractor;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchStreamExtractor;
+import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchVodExtractor;
 import org.schabi.newpipe.extractor.services.twitch.kiosks.TwitchLiveKiosk;
 import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchChannelLinkHandlerFactory;
 import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchLiveKioskLinkHandlerFactory;
@@ -33,12 +32,7 @@ import org.schabi.newpipe.extractor.stream.StreamExtractor;
 import org.schabi.newpipe.extractor.subscription.SubscriptionExtractor;
 import org.schabi.newpipe.extractor.suggestion.SuggestionExtractor;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 
 public final class TwitchService extends StreamingService {
 
@@ -98,14 +92,13 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public KioskList getKioskList() throws ExtractionException {
-        final var service = this;
         try {
             final var list = new KioskList(this);
             final var streamHandler = new TwitchLiveKioskLinkHandlerFactory();
             list.addKioskEntry((streamingService, url, kioskId) ->
-                    new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url)),
-                streamHandler,
-                TwitchLiveKiosk.KIOSK_ID
+                            new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url)),
+                    streamHandler,
+                    TwitchLiveKiosk.KIOSK_ID
             );
             list.setDefaultKiosk(TwitchLiveKiosk.KIOSK_ID);
             return list;
@@ -121,9 +114,9 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public ChannelTabExtractor getChannelTabExtractor(ListLinkHandler linkHandler) throws ExtractionException {
-//        if (linkHandler instanceof ReadyChannelTabListLinkHandler) {
-//            return ((ReadyChannelTabListLinkHandler) linkHandler).getChannelTabExtractor(this);
-//        }
+        if (linkHandler instanceof ReadyChannelTabListLinkHandler) {
+            return ((ReadyChannelTabListLinkHandler) linkHandler).getChannelTabExtractor(this);
+        }
         return null;
     }
 
@@ -134,7 +127,16 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public StreamExtractor getStreamExtractor(LinkHandler linkHandler) throws ExtractionException {
-        return new TwitchStreamExtractor(this, linkHandler);
+        final var url = linkHandler.getUrl();
+        switch (TwitchId.getIdTypeFromString(url)) {
+            case CLIP:
+                return new TwitchClipExtractor(this, linkHandler);
+            case STREAM:
+                return new TwitchStreamExtractor(this, linkHandler);
+            case VOD:
+                return new TwitchVodExtractor(this, linkHandler);
+        }
+        throw new ExtractionException("Cannot get StreamExtractor for url " + url);
     }
 
     @Override

@@ -3,26 +3,22 @@ package org.schabi.newpipe.extractor.services.twitch.extractors;
 import com.grack.nanojson.JsonParserException;
 
 import org.schabi.newpipe.extractor.Image;
-import org.schabi.newpipe.extractor.InfoItem;
-import org.schabi.newpipe.extractor.Page;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.channel.ChannelExtractor;
-import org.schabi.newpipe.extractor.channel.tabs.ChannelTabExtractor;
 import org.schabi.newpipe.extractor.channel.tabs.ChannelTabs;
 import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.linkhandler.ReadyChannelTabListLinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
+import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchChannelLinkHandlerFactory;
-import org.schabi.newpipe.extractor.stream.StreamInfoItem;
-import org.schabi.newpipe.extractor.stream.StreamType;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -38,16 +34,30 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Nonnull
     @Override
     public List<Image> getAvatars() throws ParsingException {
+        final var imageSize =
+                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.getStreamerAvatarUrl());
+        final var imageHeight = imageSize.map(ImageSize::getImageHeight)
+                .orElse(Image.HEIGHT_UNKNOWN);
+        final var imageWidth = imageSize.map(ImageSize::getImageWidth)
+                .orElse(Image.WIDTH_UNKNOWN);
+        final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
-                new Image(channelResponse.getStreamerAvatarUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)
+                new Image(channelResponse.getStreamerAvatarUrl(), imageHeight, imageWidth, resolutionLevel)
         );
     }
 
     @Nonnull
     @Override
     public List<Image> getBanners() throws ParsingException {
+        final var imageSize =
+                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.getChannelBannerUrl());
+        final var imageHeight = imageSize.map(ImageSize::getImageHeight)
+                .orElse(480);
+        final var imageWidth = imageSize.map(ImageSize::getImageWidth)
+                .orElse(1200);
+        final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
-                new Image(channelResponse.getChannelBannerUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.HIGH)
+                new Image(channelResponse.getChannelBannerUrl(), imageHeight, imageWidth, resolutionLevel)
         );
     }
 
@@ -90,7 +100,28 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Nonnull
     @Override
     public List<ListLinkHandler> getTabs() throws ParsingException {
-        return Collections.emptyList();
+        var tabs = new LinkedList<ListLinkHandler>();
+        if(channelResponse.isLive())
+            tabs.add(new ReadyChannelTabListLinkHandler(
+                    getUrl(),
+                    getId(),
+                    ChannelTabs.LIVESTREAMS,
+                    TwitchChannelStreamExtractor::new
+            ));
+        tabs.add(new ReadyChannelTabListLinkHandler(
+                getUrl(),
+                getId(),
+                ChannelTabs.VIDEOS,
+                TwitchChannelVodExtractor::new
+        ));
+        // Clips are not really shorts, but probably still the best fit ¯\_(ツ)_/¯
+        tabs.add(new ReadyChannelTabListLinkHandler(
+                getUrl(),
+                getId(),
+                ChannelTabs.SHORTS,
+                TwitchChannelClipExtractor::new
+        ));
+        return tabs;
     }
 
     @Override

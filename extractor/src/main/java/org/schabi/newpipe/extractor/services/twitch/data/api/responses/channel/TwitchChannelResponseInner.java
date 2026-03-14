@@ -20,13 +20,16 @@ public final class TwitchChannelResponseInner {
 
     private final boolean isPartner;
 
-    public TwitchChannelResponseInner(@Nonnull String channelName, @Nonnull String channelBannerUrl, @Nonnull String streamerAvatarUrl, @Nonnull String streamerDescription, int followerCount, boolean isPartner) {
+    private final boolean isLive;
+
+    public TwitchChannelResponseInner(@Nonnull String channelName, @Nonnull String channelBannerUrl, @Nonnull String streamerAvatarUrl, @Nonnull String streamerDescription, int followerCount, boolean isPartner, boolean isLive) {
         this.channelName = channelName;
         this.channelBannerUrl = channelBannerUrl;
         this.streamerAvatarUrl = streamerAvatarUrl;
         this.streamerDescription = streamerDescription;
         this.followerCount = followerCount;
         this.isPartner = isPartner;
+        this.isLive = isLive;
     }
 
     @Nonnull
@@ -55,5 +58,9 @@ public final class TwitchChannelResponseInner {
     @Nonnull
     public String getChannelName() {
         return channelName;
+    }
+
+    public boolean isLive() {
+        return isLive;
     }
 }

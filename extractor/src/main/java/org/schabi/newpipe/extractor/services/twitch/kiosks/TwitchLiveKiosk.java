@@ -13,6 +13,7 @@ import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.nowLive.TwitchNowLiveResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
@@ -52,25 +53,25 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
     @Nonnull
     @Override
     public InfoItemsPage<StreamInfoItem> getInitialPage() throws IOException, ExtractionException {
-        return new InfoItemsPage<StreamInfoItem>(
-            response.getData()
-                .stream()
-                .map(liveEntry -> {
-                    final var infoItem = new StreamInfoItem(
-                            getServiceId(),
-                            new TwitchStreamId(liveEntry.getStreamerName()).toString(),
-                            liveEntry.getStreamTitle(),
-                            StreamType.LIVE_STREAM
-                    );
-                    infoItem.setViewCount(liveEntry.getStreamViewers());
-                    infoItem.setUploaderName(liveEntry.getStreamerName());
-                    infoItem.setShortDescription(liveEntry.getGameName());
-                    // TODO Currently broken because this is always null
-                    //infoItem.setUploaderAvatars(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
-                    infoItem.setThumbnails(List.of(new Image(liveEntry.getThumbnailUrl(), 248, 440, Image.ResolutionLevel.MEDIUM)));
-                    return infoItem;
-                })
-                    .collect(Collectors.toList()),
+        return new InfoItemsPage<>(
+                response.getData()
+                        .stream()
+                        .map(liveEntry -> {
+                            final var infoItem = new StreamInfoItem(
+                                    getServiceId(),
+                                    new TwitchStreamId(liveEntry.getStreamerName()).toString(),
+                                    liveEntry.getStreamTitle(),
+                                    StreamType.LIVE_STREAM
+                            );
+                            infoItem.setViewCount(liveEntry.getStreamViewers());
+                            infoItem.setUploaderName(liveEntry.getStreamerName());
+                            infoItem.setUploaderUrl(new TwitchChannelId(liveEntry.getStreamerName()).toString());
+                            infoItem.setShortDescription(liveEntry.getGameName());
+                            infoItem.setUploaderAvatars(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
+                            infoItem.setThumbnails(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
+                            return infoItem;
+                        })
+                        .collect(Collectors.toList()),
                 null,
                 Collections.emptyList());
     }

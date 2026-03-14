@@ -8,16 +8,16 @@ import org.schabi.newpipe.extractor.services.twitch.data.api.responses.TwitchBas
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class TwitchPlaybackTokenResponse extends TwitchBaseResponse<TwitchPlaybackTokenResponseInner> {
+public final class TwitchVodPlaybackTokenResponse extends TwitchBaseResponse<TwitchSteamPlaybackTokenResponseInner> {
 
-    public TwitchPlaybackTokenResponse(@Nullable String[] errors, @Nonnull TwitchExtensionsData extensions, @Nonnull JsonObject data) {
+    public TwitchVodPlaybackTokenResponse(@Nullable String[] errors, @Nonnull TwitchExtensionsData extensions, @Nonnull JsonObject data) {
         super(errors, extensions, data);
     }
 
     @Override
-    protected TwitchPlaybackTokenResponseInner ParseData(JsonObject data) {
-        final var streamPlaybackAccessToken = data.getObject("streamPlaybackAccessToken");
-        return new TwitchPlaybackTokenResponseInner(
+    protected TwitchSteamPlaybackTokenResponseInner ParseData(JsonObject data) {
+        final var streamPlaybackAccessToken = data.getObject("videoPlaybackAccessToken");
+        return new TwitchSteamPlaybackTokenResponseInner(
             streamPlaybackAccessToken.getString("signature"),
             streamPlaybackAccessToken.getString("value")
         );

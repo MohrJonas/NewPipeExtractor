@@ -13,4 +13,8 @@ public abstract class TwitchId {
     public TwitchIdType getIdType() {
         return idType;
     }
+
+    public static TwitchIdType getIdTypeFromString(final String s) {
+        return TwitchIdType.fromString(s.split(partSeparator)[0]);
+    }
 }
