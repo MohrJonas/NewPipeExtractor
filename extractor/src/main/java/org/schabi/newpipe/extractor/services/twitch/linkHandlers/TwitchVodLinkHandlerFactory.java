@@ -5,7 +5,6 @@ import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.utils.Utils;
 
 import java.net.MalformedURLException;
-import java.util.List;
 
 public final class TwitchVodLinkHandlerFactory extends TwitchBaseLinkHandlerFactory {
 
@@ -17,8 +16,7 @@ public final class TwitchVodLinkHandlerFactory extends TwitchBaseLinkHandlerFact
             final var url = Utils.stringToURL(Utils.removeMAndWWWFromUrl(urlString));
             final var pathParts = url.getHost().split("/");
             return new TwitchVodId(pathParts[1]).toString();
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new ParsingException("Unable to parse url " + urlString, e);
         }
     }
@@ -31,14 +29,13 @@ public final class TwitchVodLinkHandlerFactory extends TwitchBaseLinkHandlerFact
 
     @Override
     public boolean onAcceptUrl(final String urlString) throws ParsingException {
-        if(!super.onAcceptUrl(urlString))
+        if (!super.onAcceptUrl(urlString))
             return false;
         try {
             final var url = Utils.stringToURL(Utils.removeMAndWWWFromUrl(urlString));
             final var pathParts = url.getPath().split("/");
             return pathParts.length == 2 && pathParts[0].equals("videos");
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             return false;
         }
     }

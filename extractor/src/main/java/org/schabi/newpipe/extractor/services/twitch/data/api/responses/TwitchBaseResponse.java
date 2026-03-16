@@ -24,8 +24,8 @@ public abstract class TwitchBaseResponse<T> {
         this.errors = errors;
         this.extensions = extensions;
         this.data = errors == null
-            ? ParseData(data)
-            : null;
+                ? ParseData(data)
+                : null;
     }
 
     protected abstract T ParseData(JsonObject data);
@@ -46,7 +46,7 @@ public abstract class TwitchBaseResponse<T> {
     }
 
     public void ensureSuccess() throws IOException {
-        if(errors == null)
+        if (errors == null)
             return;
         var messageString = String.join("; ", errors);
         throw new IOException(messageString);

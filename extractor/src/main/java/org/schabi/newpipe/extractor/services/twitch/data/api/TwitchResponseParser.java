@@ -1,15 +1,10 @@
 package org.schabi.newpipe.extractor.services.twitch.data.api;
 
-import com.grack.nanojson.JsonArray;
 import com.grack.nanojson.JsonObject;
 
-import org.schabi.newpipe.extractor.services.twitch.Assertions;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.TwitchBaseResponse;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public final class TwitchResponseParser {
     public static <T extends TwitchBaseResponse<?>> T parseFromJson(JsonObject object, Class<T> clazz) {

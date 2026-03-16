@@ -16,16 +16,6 @@ public final class TwitchLiveKioskId extends TwitchId {
         this.kioskType = kioskType;
     }
 
-    @Nonnull
-    public String getKioskType() {
-        return kioskType;
-    }
-
-    @Override
-    public String toString() {
-        return String.join(partSeparator, TwitchIdType.asString(getIdType()), kioskType);
-    }
-
     public static @Nonnull TwitchLiveKioskId fromString(@Nonnull final String kioskIdString) {
         final var parts = kioskIdString.split(partSeparator);
         Assertions.assertThat(() -> parts.length == 2);
@@ -34,5 +24,15 @@ public final class TwitchLiveKioskId extends TwitchId {
         Assertions.assertThat(() -> idType == TwitchIdType.KIOSK);
 
         return new TwitchLiveKioskId(kioskIdString);
+    }
+
+    @Nonnull
+    public String getKioskType() {
+        return kioskType;
+    }
+
+    @Override
+    public String toString() {
+        return String.join(partSeparator, TwitchIdType.asString(getIdType()), kioskType);
     }
 }

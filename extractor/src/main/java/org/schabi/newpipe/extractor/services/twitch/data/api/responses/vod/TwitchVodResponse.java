@@ -20,7 +20,7 @@ public final class TwitchVodResponse extends TwitchBaseResponse<TwitchVodRespons
         return vodObjects.streamAsJsonObjects().map(obj -> {
             final var node = obj.getObject("node");
             return new TwitchVodResponseInner(
-                node.getString("previewThumbnailURL"),
+                    node.getString("previewThumbnailURL"),
                     node.getObject("game").getString("displayName"),
                     node.getString("id"),
                     node.getString("title"),

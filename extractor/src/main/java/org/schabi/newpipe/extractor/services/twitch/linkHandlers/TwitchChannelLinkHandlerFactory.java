@@ -13,8 +13,8 @@ public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactor
     public String getId(String url) throws ParsingException, UnsupportedOperationException {
         try {
             return TwitchChannelId.fromString(url).getChannelName();
+        } catch (AssertionError ignored) {
         }
-        catch (AssertionError ignored) {}
         return TwitchStreamId.fromString(url).getStreamId();
     }
 
@@ -28,13 +28,13 @@ public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactor
         try {
             TwitchChannelId.fromString(urlString);
             return true;
+        } catch (AssertionError ignored) {
         }
-        catch (AssertionError ignored) {}
         try {
             TwitchStreamId.fromString(urlString);
             return true;
+        } catch (AssertionError ignored) {
         }
-        catch (AssertionError ignored) {}
         return false;
     }
 }

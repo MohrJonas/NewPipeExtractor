@@ -7,18 +7,19 @@ import java.util.regex.Pattern;
 
 public final class TwitchUtils {
 
-    private TwitchUtils() {}
+    private static final Pattern imageSizePattern = Pattern.compile("(\\d+)x(\\d+)");
+
+    private TwitchUtils() {
+    }
 
     public static boolean isSuccessfulResponseCode(final int code) {
         // 2xx is success. Not all there exist but whatever
         return code >= 200 && code < 300;
     }
 
-    private static final Pattern imageSizePattern = Pattern.compile("(\\d+)x(\\d+)");
-
     public static Optional<ImageSize> tryGetImageSizeFromUrl(final String url) {
         final var matcher = imageSizePattern.matcher(url);
-        if(matcher.find())
+        if (matcher.find())
             return Optional.of(
                     new ImageSize(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)))
             );

@@ -2,13 +2,6 @@ package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchClipId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchLiveKioskId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchQueryId;
-import org.schabi.newpipe.extractor.utils.Utils;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
 
 public final class TwitchClipLinkHandlerFactory extends TwitchBaseLinkHandlerFactory {
 

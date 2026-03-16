@@ -12,12 +12,11 @@ import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.TwitchResponseParser;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.nowLive.TwitchNowLiveResponse;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchStreamPlaybackTokenResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchVodPlaybackTokenResponse;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchVodPlaybackTokenResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.TwitchSearchResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.vod.TwitchVodResponse;
@@ -154,7 +153,7 @@ public final class TwitchApi {
             final var arrayElement = (JsonObject) array.get(i);
             data.put("synthetic-" + i, arrayElement.getObject("data"));
             totalDuration += arrayElement.getObject("extensions").getLong("durationMilliseconds");
-            if(arrayElement.has("errors"))
+            if (arrayElement.has("errors"))
                 errors.addAll(arrayElement.getArray("errors"));
         }
         final var fullObject = new JsonObject();
@@ -162,7 +161,7 @@ public final class TwitchApi {
         final var fullExtensions = new JsonObject();
         fullExtensions.put("durationMilliseconds", totalDuration);
         fullObject.put("extensions", fullExtensions);
-        if(!errors.isEmpty())
+        if (!errors.isEmpty())
             fullObject.put("errors", errors);
         return fullObject;
     }

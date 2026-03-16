@@ -12,8 +12,8 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchClipId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
@@ -51,12 +51,18 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
                             Image.WIDTH_UNKNOWN,
                             Image.ResolutionLevel.UNKNOWN
                     )));
+                    try {
+                        item.setUploaderName(getId() + " + " + res.getClipperName());
+                    } catch (ParsingException e) {
+                        item.setUploaderName("");
+                    }
                     item.setDuration(res.getClipLength());
                     item.setViewCount(res.getClipViewerCount());
                     item.setShortDescription("(" + res.getClipperName() + "), " + res.getGameName());
                     try {
                         item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
-                    } catch (ParsingException ignored) {}
+                    } catch (ParsingException ignored) {
+                    }
                     return item;
                 }
         ).collect(Collectors.toList()), null, Collections.emptyList());

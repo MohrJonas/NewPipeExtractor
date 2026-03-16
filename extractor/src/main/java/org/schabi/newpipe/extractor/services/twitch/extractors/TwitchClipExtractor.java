@@ -13,7 +13,6 @@ import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
-import org.schabi.newpipe.extractor.stream.Stream;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
@@ -70,14 +69,14 @@ public final class TwitchClipExtractor extends StreamExtractor {
     @Override
     public List<VideoStream> getVideoStreams() throws IOException, ExtractionException {
         return Arrays.stream(clipResponse).map(res ->
-            new VideoStream.Builder()
-                    .setId(VideoStream.ID_UNKNOWN)
-                    .setContent(res.getClipUrl(), true)
-                    .setDeliveryMethod(DeliveryMethod.PROGRESSIVE_HTTP)
-                    .setResolution(res.getClipWidth() + "x" + res.getClipHeight())
-                    .setIsVideoOnly(false)
-                    .setMediaFormat(MediaFormat.MPEG_4)
-                    .build()
+                new VideoStream.Builder()
+                        .setId(VideoStream.ID_UNKNOWN)
+                        .setContent(res.getClipUrl(), true)
+                        .setDeliveryMethod(DeliveryMethod.PROGRESSIVE_HTTP)
+                        .setResolution(res.getClipWidth() + "x" + res.getClipHeight())
+                        .setIsVideoOnly(false)
+                        .setMediaFormat(MediaFormat.MPEG_4)
+                        .build()
         ).collect(Collectors.toList());
     }
 

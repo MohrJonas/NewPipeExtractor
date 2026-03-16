@@ -11,7 +11,6 @@ import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.vod.TwitchVodResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
@@ -23,10 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
@@ -44,8 +40,7 @@ public class TwitchVodExtractor extends StreamExtractor {
             final var token = TwitchApi.getVodPlaybackToken(downloader, getId());
             final var playSessionId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);
             streams = TwitchApi.getM3U8VodPlaybackUrl(downloader, getId(), token.getData().getSignature(), token.getData().getValue(), playSessionId);
-        }
-        catch (JsonParserException e) {
+        } catch (JsonParserException e) {
             throw new IOException(e);
         }
     }
@@ -82,15 +77,15 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Override
     public List<VideoStream> getVideoStreams() throws IOException, ExtractionException {
         return Arrays.stream(streams).map(res ->
-                new VideoStream.Builder()
-                        .setId(VideoStream.ID_UNKNOWN)
-                        .setContent(res.getStreamUrl(), true)
-                        .setDeliveryMethod(DeliveryMethod.HLS)
-                        .setResolution(res.getResolution())
-                        .setIsVideoOnly(false)
-                        .setMediaFormat(MediaFormat.MPEG_4)
-                        .build()
-        )
+                        new VideoStream.Builder()
+                                .setId(VideoStream.ID_UNKNOWN)
+                                .setContent(res.getStreamUrl(), true)
+                                .setDeliveryMethod(DeliveryMethod.HLS)
+                                .setResolution(res.getResolution())
+                                .setIsVideoOnly(false)
+                                .setMediaFormat(MediaFormat.MPEG_4)
+                                .build()
+                )
                 .collect(Collectors.toList());
     }
 

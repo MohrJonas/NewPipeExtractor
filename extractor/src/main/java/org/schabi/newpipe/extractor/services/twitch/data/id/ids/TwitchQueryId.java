@@ -16,16 +16,6 @@ public final class TwitchQueryId extends TwitchId {
         this.queryString = queryString;
     }
 
-    @Nonnull
-    public String getQueryString() {
-        return queryString;
-    }
-
-    @Override
-    public String toString() {
-        return String.join(partSeparator, TwitchIdType.asString(getIdType()), queryString);
-    }
-
     public static @Nonnull TwitchQueryId fromString(@Nonnull final String twitchIdString) {
         final var parts = twitchIdString.split(partSeparator);
         Assertions.assertThat(() -> parts.length == 2);
@@ -34,5 +24,15 @@ public final class TwitchQueryId extends TwitchId {
         Assertions.assertThat(() -> idType == TwitchIdType.QUERY);
 
         return new TwitchQueryId(parts[1]);
+    }
+
+    @Nonnull
+    public String getQueryString() {
+        return queryString;
+    }
+
+    @Override
+    public String toString() {
+        return String.join(partSeparator, TwitchIdType.asString(getIdType()), queryString);
     }
 }

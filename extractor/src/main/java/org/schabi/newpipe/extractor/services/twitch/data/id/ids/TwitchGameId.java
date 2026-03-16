@@ -16,15 +16,6 @@ public final class TwitchGameId extends TwitchId {
         this.gameName = gameName;
     }
 
-    public String toString() {
-        return String.join(partSeparator, TwitchIdType.asString(getIdType()), gameName);
-    }
-
-    @Nonnull
-    public String getGameName() {
-        return gameName;
-    }
-
     public static @Nonnull TwitchGameId fromString(@Nonnull final String twitchIdString) {
         final var parts = twitchIdString.split(partSeparator);
         Assertions.assertThat(() -> parts.length == 2);
@@ -33,5 +24,14 @@ public final class TwitchGameId extends TwitchId {
         Assertions.assertThat(() -> idType == TwitchIdType.GAME);
 
         return new TwitchGameId(parts[1]);
+    }
+
+    public String toString() {
+        return String.join(partSeparator, TwitchIdType.asString(getIdType()), gameName);
+    }
+
+    @Nonnull
+    public String getGameName() {
+        return gameName;
     }
 }

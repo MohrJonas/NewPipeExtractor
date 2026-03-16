@@ -2,12 +2,6 @@ package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandlerFactory;
-import org.schabi.newpipe.extractor.utils.Utils;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import jdk.jshell.execution.Util;
 
 public abstract class TwitchBaseLinkHandlerFactory extends LinkHandlerFactory {
 

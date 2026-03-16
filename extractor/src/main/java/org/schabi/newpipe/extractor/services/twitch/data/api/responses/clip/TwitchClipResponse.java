@@ -20,7 +20,7 @@ public final class TwitchClipResponse extends TwitchBaseResponse<TwitchClipRespo
         return clipObjects.streamAsJsonObjects().map(obj -> {
             final var node = obj.getObject("node");
             return new TwitchClipResponseInner(
-                node.getString("thumbnailURL"),
+                    node.getString("thumbnailURL"),
                     node.getObject("game").getString("name"),
                     node.getString("title"),
                     node.getString("slug"),

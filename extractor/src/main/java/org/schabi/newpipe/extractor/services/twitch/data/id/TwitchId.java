@@ -10,11 +10,11 @@ public abstract class TwitchId {
         this.idType = idType;
     }
 
-    public TwitchIdType getIdType() {
-        return idType;
-    }
-
     public static TwitchIdType getIdTypeFromString(final String s) {
         return TwitchIdType.fromString(s.split(partSeparator)[0]);
+    }
+
+    public TwitchIdType getIdType() {
+        return idType;
     }
 }

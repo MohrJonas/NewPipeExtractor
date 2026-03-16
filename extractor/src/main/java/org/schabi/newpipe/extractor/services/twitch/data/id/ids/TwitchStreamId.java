@@ -16,16 +16,6 @@ public final class TwitchStreamId extends TwitchId {
         this.streamId = streamId;
     }
 
-    @Nonnull
-    public String getStreamId() {
-        return streamId;
-    }
-
-    @Override
-    public String toString() {
-        return String.join(partSeparator, TwitchIdType.asString(getIdType()), streamId);
-    }
-
     public static @Nonnull TwitchStreamId fromString(@Nonnull final String twitchIdString) {
         final var parts = twitchIdString.split(partSeparator);
         Assertions.assertThat(() -> parts.length == 2);
@@ -34,5 +24,15 @@ public final class TwitchStreamId extends TwitchId {
         Assertions.assertThat(() -> idType == TwitchIdType.STREAM);
 
         return new TwitchStreamId(parts[1]);
+    }
+
+    @Nonnull
+    public String getStreamId() {
+        return streamId;
+    }
+
+    @Override
+    public String toString() {
+        return String.join(partSeparator, TwitchIdType.asString(getIdType()), streamId);
     }
 }

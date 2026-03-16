@@ -51,13 +51,19 @@ public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
                             Image.WIDTH_UNKNOWN,
                             Image.ResolutionLevel.UNKNOWN
                     )));
+                    try {
+                        item.setUploaderName(getId());
+                    } catch (ParsingException e) {
+                        item.setUploaderName("");
+                    }
                     item.setDuration(res.getVodLength());
                     item.setViewCount(res.getVodViewerCount());
                     item.setShortDescription(res.getGameName());
-            try {
-                item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
-            } catch (ParsingException ignored) {}
-            return item;
+                    try {
+                        item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
+                    } catch (ParsingException ignored) {
+                    }
+                    return item;
                 }
         ).collect(Collectors.toList()), null, Collections.emptyList());
     }

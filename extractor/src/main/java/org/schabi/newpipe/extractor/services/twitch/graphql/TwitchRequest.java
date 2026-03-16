@@ -15,5 +15,6 @@ public final class TwitchRequest {
         var object = new JsonObject();
         object.put("query", query);
         return JsonWriter.string(object);
-    };
+    }
+
 }

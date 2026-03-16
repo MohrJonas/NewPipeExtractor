@@ -17,9 +17,9 @@ import org.schabi.newpipe.extractor.search.SearchExtractor;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.TwitchSearchResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchChannelResponseEntry;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchGameResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchStreamResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchVodResponseEntry;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchGameResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchGameId;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchQueryId;
@@ -42,46 +42,6 @@ public class TwitchSearchExtractor extends SearchExtractor {
     public TwitchSearchExtractor(final StreamingService service,
                                  final SearchQueryHandler linkHandler) {
         super(service, linkHandler);
-    }
-
-    @Nonnull
-    @Override
-    public String getSearchSuggestion() throws ParsingException {
-        return "";
-    }
-
-    @Override
-    public boolean isCorrectedSearch() throws ParsingException {
-        return false;
-    }
-
-    @Nonnull
-    @Override
-    public List<MetaInfo> getMetaInfo() throws ParsingException {
-        return Collections.emptyList();
-    }
-
-    @Nonnull
-    @Override
-    public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
-        return new InfoItemsPage<>(
-            response.getData()
-                .stream()
-                .map(searchEntry -> {
-                    if(searchEntry instanceof TwitchSearchChannelResponseEntry)
-                        return buildChannelInfoItem(getServiceId(), (TwitchSearchChannelResponseEntry) searchEntry);
-                    else if(searchEntry instanceof TwitchSearchStreamResponseEntry)
-                        return buildStreamInfoItem(getServiceId(), (TwitchSearchStreamResponseEntry) searchEntry);
-                    else if(searchEntry instanceof TwitchSearchVodResponseEntry)
-                        return buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
-                    else if(searchEntry instanceof TwitchSearchGameResponseEntry)
-                        return buildGameInfoItem(getServiceId(), (TwitchSearchGameResponseEntry) searchEntry);
-                    else throw new RuntimeException();
-                })
-                .collect(Collectors.toList()),
-            null,
-                Collections.emptyList()
-        );
     }
 
     private static StreamInfoItem buildStreamInfoItem(final int serviceId, final TwitchSearchStreamResponseEntry entry) {
@@ -145,6 +105,46 @@ public class TwitchSearchExtractor extends SearchExtractor {
                 new Image(entry.getStreamThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
         ));
         return item;
+    }
+
+    @Nonnull
+    @Override
+    public String getSearchSuggestion() throws ParsingException {
+        return "";
+    }
+
+    @Override
+    public boolean isCorrectedSearch() throws ParsingException {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    public List<MetaInfo> getMetaInfo() throws ParsingException {
+        return Collections.emptyList();
+    }
+
+    @Nonnull
+    @Override
+    public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
+        return new InfoItemsPage<>(
+                response.getData()
+                        .stream()
+                        .map(searchEntry -> {
+                            if (searchEntry instanceof TwitchSearchChannelResponseEntry)
+                                return buildChannelInfoItem(getServiceId(), (TwitchSearchChannelResponseEntry) searchEntry);
+                            else if (searchEntry instanceof TwitchSearchStreamResponseEntry)
+                                return buildStreamInfoItem(getServiceId(), (TwitchSearchStreamResponseEntry) searchEntry);
+                            else if (searchEntry instanceof TwitchSearchVodResponseEntry)
+                                return buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
+                            else if (searchEntry instanceof TwitchSearchGameResponseEntry)
+                                return buildGameInfoItem(getServiceId(), (TwitchSearchGameResponseEntry) searchEntry);
+                            else throw new RuntimeException();
+                        })
+                        .collect(Collectors.toList()),
+                null,
+                Collections.emptyList()
+        );
     }
 
     @Override

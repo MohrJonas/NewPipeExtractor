@@ -16,15 +16,6 @@ public final class TwitchChannelId extends TwitchId {
         this.channelName = channelName;
     }
 
-    public String toString() {
-        return String.join(partSeparator, TwitchIdType.asString(getIdType()), channelName);
-    }
-
-    @Nonnull
-    public String getChannelName() {
-        return channelName;
-    }
-
     public static @Nonnull TwitchChannelId fromString(@Nonnull final String twitchIdString) {
         final var parts = twitchIdString.split(partSeparator);
         Assertions.assertThat(() -> parts.length == 2);
@@ -33,5 +24,14 @@ public final class TwitchChannelId extends TwitchId {
         Assertions.assertThat(() -> idType == TwitchIdType.CHANNEL);
 
         return new TwitchChannelId(parts[1]);
+    }
+
+    public String toString() {
+        return String.join(partSeparator, TwitchIdType.asString(getIdType()), channelName);
+    }
+
+    @Nonnull
+    public String getChannelName() {
+        return channelName;
     }
 }

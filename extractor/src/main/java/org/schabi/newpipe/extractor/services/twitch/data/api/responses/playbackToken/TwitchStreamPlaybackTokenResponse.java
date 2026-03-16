@@ -18,8 +18,8 @@ public final class TwitchStreamPlaybackTokenResponse extends TwitchBaseResponse<
     protected TwitchVodPlaybackTokenResponseInner ParseData(JsonObject data) {
         final var streamPlaybackAccessToken = data.getObject("streamPlaybackAccessToken");
         return new TwitchVodPlaybackTokenResponseInner(
-            streamPlaybackAccessToken.getString("signature"),
-            streamPlaybackAccessToken.getString("value")
+                streamPlaybackAccessToken.getString("signature"),
+                streamPlaybackAccessToken.getString("value")
         );
     }
 }
