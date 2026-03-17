@@ -55,7 +55,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Override
     public String getName() throws ParsingException {
         if(cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getUploaderName();
+            return cache.get(getUrl()).getName();
         return "???";
     }
 
