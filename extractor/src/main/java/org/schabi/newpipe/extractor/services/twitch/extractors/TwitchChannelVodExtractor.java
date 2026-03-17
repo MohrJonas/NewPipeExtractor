@@ -23,16 +23,21 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
 
+    private final Map<String, StreamInfoItem> cache;
     private TwitchVodResponseInner[] response;
 
-    public TwitchChannelVodExtractor(StreamingService service, ListLinkHandler linkHandler) {
+    public TwitchChannelVodExtractor(final StreamingService service,
+                                     final ListLinkHandler linkHandler,
+                                     final Map<String, StreamInfoItem> cache) {
         super(service, linkHandler);
+        this.cache = cache;
     }
 
     @Nonnull
@@ -63,6 +68,10 @@ public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
                         item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
                     } catch (ParsingException ignored) {
                     }
+                    cache.put(
+                            new TwitchVodId(res.getVodId()).toString(),
+                            item
+                    );
                     return item;
                 }
         ).collect(Collectors.toList()), null, Collections.emptyList());

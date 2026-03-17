@@ -16,19 +16,25 @@ import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
 public class TwitchChannelExtractor extends ChannelExtractor {
 
+    private final Map<String, StreamInfoItem> cache;
     private TwitchChannelResponseInner channelResponse;
 
-    public TwitchChannelExtractor(StreamingService service, ListLinkHandler linkHandler) {
+    public TwitchChannelExtractor(final StreamingService service,
+                                  final ListLinkHandler linkHandler,
+                                  final Map<String, StreamInfoItem> cache) {
         super(service, linkHandler);
+        this.cache = cache;
     }
 
     @Nonnull
@@ -112,14 +118,16 @@ public class TwitchChannelExtractor extends ChannelExtractor {
                 getUrl(),
                 getId(),
                 ChannelTabs.VIDEOS,
-                TwitchChannelVodExtractor::new
+                (service, linkHandler) ->
+                        new TwitchChannelVodExtractor(service, linkHandler, cache)
         ));
         // Clips are not really shorts, but probably still the best fit ¯\_(ツ)_/¯
         tabs.add(new ReadyChannelTabListLinkHandler(
                 getUrl(),
                 getId(),
                 ChannelTabs.SHORTS,
-                TwitchChannelClipExtractor::new
+                (service, linkHandler) ->
+                    new TwitchChannelClipExtractor(service, linkHandler, cache)
         ));
         return tabs;
     }

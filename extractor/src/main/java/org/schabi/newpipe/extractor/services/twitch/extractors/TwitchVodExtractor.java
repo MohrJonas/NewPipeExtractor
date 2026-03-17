@@ -14,6 +14,7 @@ import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,10 +30,14 @@ import javax.annotation.Nonnull;
 
 public class TwitchVodExtractor extends StreamExtractor {
 
+    private final Map<String, StreamInfoItem> cache;
     private TwitchVideoStream[] streams;
 
-    public TwitchVodExtractor(StreamingService service, LinkHandler linkHandler) {
+    public TwitchVodExtractor(final StreamingService service,
+                              final LinkHandler linkHandler,
+                              final Map<String, StreamInfoItem> cache) {
         super(service, linkHandler);
+        this.cache = cache;
     }
 
     @Override
@@ -48,24 +54,32 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
+        if(cache.containsKey(getUrl()))
+            return cache.get(getUrl()).getUploaderName();
         return "???";
     }
 
     @Nonnull
     @Override
     public List<Image> getThumbnails() throws ParsingException {
-        return List.of();
+        if(cache.containsKey(getUrl()))
+            return cache.get(getUrl()).getThumbnails();
+        return Collections.emptyList();
     }
 
     @Nonnull
     @Override
     public String getUploaderUrl() throws ParsingException {
+        if(cache.containsKey(getUrl()))
+            return cache.get(getUrl()).getUploaderUrl();
         return "???";
     }
 
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
+        if(cache.containsKey(getUrl()))
+            return cache.get(getUrl()).getUploaderName();
         return "???";
     }
 
@@ -91,6 +105,14 @@ public class TwitchVodExtractor extends StreamExtractor {
 
     @Override
     public List<VideoStream> getVideoOnlyStreams() throws IOException, ExtractionException {
+        return Collections.emptyList();
+    }
+
+    @Nonnull
+    @Override
+    public List<Image> getUploaderAvatars() throws ParsingException {
+        if(cache.containsKey(getUrl()))
+            return cache.get(getUrl()).getUploaderAvatars();
         return Collections.emptyList();
     }
 

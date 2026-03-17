@@ -29,12 +29,19 @@ import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchLiveKiosk
 import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchSearchQueryHandlerFactory;
 import org.schabi.newpipe.extractor.services.twitch.linkHandlers.TwitchStreamLinkHandlerFactory;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.subscription.SubscriptionExtractor;
 import org.schabi.newpipe.extractor.suggestion.SuggestionExtractor;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 
 public final class TwitchService extends StreamingService {
+
+    private final Map<String, StreamInfoItem> streamInfoCache = new HashMap<>();
 
     public TwitchService(final int id) {
         super(id, "Twitch", EnumSet.of(LIVE));
@@ -47,7 +54,7 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public SearchExtractor getSearchExtractor(SearchQueryHandler queryHandler) {
-        return new TwitchSearchExtractor(this, queryHandler);
+        return new TwitchSearchExtractor(this, queryHandler, streamInfoCache);
     }
 
     @Override
@@ -96,7 +103,7 @@ public final class TwitchService extends StreamingService {
             final var list = new KioskList(this);
             final var streamHandler = new TwitchLiveKioskLinkHandlerFactory();
             list.addKioskEntry((streamingService, url, kioskId) ->
-                            new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url)),
+                            new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url), streamInfoCache),
                     streamHandler,
                     TwitchLiveKiosk.KIOSK_ID
             );
@@ -109,7 +116,7 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public ChannelExtractor getChannelExtractor(ListLinkHandler linkHandler) throws ExtractionException {
-        return new TwitchChannelExtractor(this, linkHandler);
+        return new TwitchChannelExtractor(this, linkHandler, streamInfoCache);
     }
 
     @Override
@@ -130,11 +137,11 @@ public final class TwitchService extends StreamingService {
         final var url = linkHandler.getUrl();
         switch (TwitchId.getIdTypeFromString(url)) {
             case CLIP:
-                return new TwitchClipExtractor(this, linkHandler);
+                return new TwitchClipExtractor(this, linkHandler, streamInfoCache);
             case STREAM:
-                return new TwitchStreamExtractor(this, linkHandler);
+                return new TwitchStreamExtractor(this, linkHandler, streamInfoCache);
             case VOD:
-                return new TwitchVodExtractor(this, linkHandler);
+                return new TwitchVodExtractor(this, linkHandler, streamInfoCache);
         }
         throw new ExtractionException("Cannot get StreamExtractor for url " + url);
     }

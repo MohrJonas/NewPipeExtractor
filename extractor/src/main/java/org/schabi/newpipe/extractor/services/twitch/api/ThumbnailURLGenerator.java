@@ -7,5 +7,4 @@ public final class ThumbnailURLGenerator {
     public static String getThumbnailURLForStream(final String streamerName) {
         return String.format(THUMBNAIL_URL_TEMPLATE, streamerName.toLowerCase());
     }
-
 }

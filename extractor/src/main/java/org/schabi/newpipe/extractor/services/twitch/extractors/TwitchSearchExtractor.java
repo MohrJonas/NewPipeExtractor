@@ -31,17 +31,21 @@ import org.schabi.newpipe.extractor.stream.StreamType;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 public class TwitchSearchExtractor extends SearchExtractor {
 
+    private final Map<String, StreamInfoItem> cache;
     private TwitchSearchResponse response;
 
     public TwitchSearchExtractor(final StreamingService service,
-                                 final SearchQueryHandler linkHandler) {
+                                 final SearchQueryHandler linkHandler,
+                                 final Map<String, StreamInfoItem> cache) {
         super(service, linkHandler);
+        this.cache = cache;
     }
 
     private static StreamInfoItem buildStreamInfoItem(final int serviceId, final TwitchSearchStreamResponseEntry entry) {
@@ -127,6 +131,21 @@ public class TwitchSearchExtractor extends SearchExtractor {
     @Nonnull
     @Override
     public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
+        response.getData()
+                .stream()
+                .filter(searchEntry ->
+                        searchEntry instanceof TwitchSearchStreamResponseEntry
+                                || searchEntry instanceof TwitchSearchVodResponseEntry
+                )
+                .forEach(searchEntry -> {
+                    final var key = searchEntry instanceof TwitchSearchStreamResponseEntry
+                            ? new TwitchStreamId(((TwitchSearchStreamResponseEntry) searchEntry).getChannelName()).toString()
+                            : new TwitchVodId(((TwitchSearchVodResponseEntry) searchEntry).getVodTitle()).toString();
+                    final var value = searchEntry instanceof TwitchSearchStreamResponseEntry
+                            ? buildStreamInfoItem(getServiceId(), (TwitchSearchStreamResponseEntry) searchEntry)
+                            : buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
+                    cache.put(key, value);
+                });
         return new InfoItemsPage<>(
                 response.getData()
                         .stream()

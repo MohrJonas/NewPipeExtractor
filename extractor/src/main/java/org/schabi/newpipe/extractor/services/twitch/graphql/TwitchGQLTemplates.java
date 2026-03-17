@@ -22,6 +22,7 @@ public final class TwitchGQLTemplates {
             "    displayName\\n" +
             "    stream {\\n" +
             "      title\\n" +
+            "      viewersCount\\n" +
             "    }\\n" +
             "  }\\n" +
             "}\"}";

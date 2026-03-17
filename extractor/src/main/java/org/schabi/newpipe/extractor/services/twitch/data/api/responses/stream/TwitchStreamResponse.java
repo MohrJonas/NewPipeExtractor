@@ -20,6 +20,8 @@ public final class TwitchStreamResponse extends TwitchBaseResponse<TwitchStreamR
         final var streamerName = user.getString("displayName");
         final var stream = user.getObject("stream");
         final var streamTitle = stream.getString("title");
-        return new TwitchStreamResponseInner(streamerName, streamTitle);
+        final var viewerCount = stream.getInt("viewersCount");
+        final var createdAtString = stream.getString("createdAt");
+        return new TwitchStreamResponseInner(streamerName, streamTitle, viewerCount, createdAtString);
     }
 }

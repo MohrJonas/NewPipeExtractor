@@ -8,6 +8,7 @@ import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
@@ -15,6 +16,7 @@ import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 
@@ -22,23 +24,30 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 public class TwitchStreamExtractor extends StreamExtractor {
 
+    private final Map<String, StreamInfoItem> cache;
     private TwitchStreamResponseInner response;
     private TwitchVideoStream[] streams;
 
-    public TwitchStreamExtractor(StreamingService service, LinkHandler linkHandler) {
+    public TwitchStreamExtractor(final StreamingService service,
+                                 final LinkHandler linkHandler,
+                                 final Map<String, StreamInfoItem> cache) {
         super(service, linkHandler);
+        this.cache = cache;
     }
 
     @Nonnull
     @Override
     public List<Image> getThumbnails() throws ParsingException {
-        return Collections.emptyList();
+        return List.of(
+                new Image(ThumbnailURLGenerator.getThumbnailURLForStream(response.getStreamerName()), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
+        );
     }
 
     @Nonnull
