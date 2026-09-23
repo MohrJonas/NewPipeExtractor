@@ -125,11 +125,7 @@ public class SoundcloudPlaylistExtractor extends PlaylistExtractor {
     @Nonnull
     @Override
     public Description getDescription() throws ParsingException {
-        final String description = playlist.getString("description");
-        if (isNullOrEmpty(description)) {
-            return Description.EMPTY_DESCRIPTION;
-        }
-        return new Description(description, Description.PLAIN_TEXT);
+        return Description.of(playlist.getString("description"), Description.Type.PLAIN_TEXT);
     }
 
     @Nonnull
@@ -140,9 +136,7 @@ public class SoundcloudPlaylistExtractor extends PlaylistExtractor {
         final List<String> ids = new ArrayList<>();
 
         playlist.getArray("tracks")
-                .stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+                .streamAsJsonObjects()
                 .forEachOrdered(track -> {
                     // i.e. if full info is available
                     if (track.has("title")) {

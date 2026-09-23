@@ -23,7 +23,7 @@
     "responseMessage": "",
     "responseHeaders": {
       "accept-ch": [
-        "Sec-CH-Viewport-Width, Sec-CH-DPR"
+        "Sec-CH-Viewport-Width, Sec-CH-DPR, Device-Memory"
       ],
       "access-control-allow-credentials": [
         "true"
@@ -39,10 +39,8 @@
       ],
       "content-security-policy": [
         "script-src \u0027unsafe-eval\u0027 \u0027self\u0027 \u0027unsafe-inline\u0027 https://www.google.com https://apis.google.com https://ssl.gstatic.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://*.youtube.com https://*.google.com https://*.gstatic.com https://youtube.com https://www.youtube.com https://google.com https://*.doubleclick.net https://*.googleapis.com https://www.googleadservices.com https://tpc.googlesyndication.com https://www.youtubekids.com https://www.youtube-nocookie.com https://www.youtubeeducation.com https://www-onepick-opensocial.googleusercontent.com;report-uri https://csp.withgoogle.com/csp/youtube_main/allowlist",
+        "base-uri \u0027self\u0027;object-src \u0027none\u0027;script-src \u0027nonce-p-xcfgc1_PPRYZY48zMgxw\u0027 \u0027unsafe-inline\u0027 \u0027strict-dynamic\u0027 https: http: \u0027unsafe-eval\u0027;report-uri https://csp.withgoogle.com/csp/youtube_main/strict",
         "require-trusted-types-for \u0027script\u0027"
-      ],
-      "content-security-policy-report-only": [
-        "report-uri https://csp.withgoogle.com/csp/youtube_main/strict;base-uri \u0027self\u0027;object-src \u0027none\u0027;script-src \u0027nonce-P5xY0_lrR2Gg8GO_jmjsPw\u0027 \u0027unsafe-inline\u0027 \u0027strict-dynamic\u0027 https: http: \u0027unsafe-eval\u0027"
       ],
       "content-type": [
         "text/javascript; charset\u003dutf-8"
@@ -51,13 +49,13 @@
         "same-origin; report-to\u003d\"youtube_main\""
       ],
       "date": [
-        "Mon, 26 Jan 2026 18:05:05 GMT"
+        "Thu, 06 Aug 2026 14:14:00 GMT"
       ],
       "document-policy": [
         "include-js-call-stacks-in-crash-reports"
       ],
       "expires": [
-        "Mon, 26 Jan 2026 18:05:05 GMT"
+        "Thu, 06 Aug 2026 14:14:00 GMT"
       ],
       "origin-trial": [
         "AmhMBR6zCLzDDxpW+HfpP67BqwIknWnyMOXOQGfzYswFmJe+fgaI6XZgAzcxOrzNtP7hEDsOo1jdjFnVr2IdxQ4AAAB4eyJvcmlnaW4iOiJodHRwczovL3lvdXR1YmUuY29tOjQ0MyIsImZlYXR1cmUiOiJXZWJWaWV3WFJlcXVlc3RlZFdpdGhEZXByZWNhdGlvbiIsImV4cGlyeSI6MTc1ODA2NzE5OSwiaXNTdWJkb21haW4iOnRydWV9",
@@ -73,20 +71,21 @@
         "{\"group\":\"youtube_main\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/youtube_main\"}]}"
       ],
       "reporting-endpoints": [
-        "default\u003d\"/web-reports?context\u003deJwN0ntI1XcYx_F-vmnJOcdzfr_f9_uUy9jCjAg7clQUakQslo3Akm5UVpq3cKWO0_Gk0rYmqzmKtmhd7LIVWxfSCgqEMrvZ1kXnJZMsqkEZIVmxRkuoVt8_XjzwwPPh4eHxtA9f-a7MSvq83Fo6IWzN6Fxjbc6KWP8diljHmiPW4NiolZsYtXb1Rq3Vf1dZv9iLYqpGL4ppXuKhpMTDy3oP_9z1UPXcQ26yl55ZXgZne2k67KX5pJd7j718VOYjo9LHQE4cLfVxTJrv58hpPzlX_Gw1nr31kzk1QLQ4gDcaYPcPAVJ3Bog9EGDU9QAtSTaTs21i8208xo09NmXHbO6-slmmHLZkOOxd4HAvzyF7pcO6dQ7fGdO3OJw_6pBw3EHddBgz4PBgyKFmisudLJd3s1yOzHXJznV5XOFy6bzL1A6XaZ0un9xwGX_LJX7IJXaEYs5oRXaCouFjhUpUZCUpghmKoTkKT4Vim7EhrHi0XvHp94rF2xU1hxUxjYprxtlTivwziottiss3zXyfotoY_0Tx8wvFm9eKb_2adK3JGaWJz9R0ZGleGL6ZmjgjsUhTENEs_Enzdb3mnHF8v-av3zQ9Rtfvpho7GjVLWjQzLmgKWzV_XtEMGg3XNKe7NE-6jR5NXa_p9WnK7mgm9mvyXmr-eKPp_1-zb5gwbbjw2ieMsYXFrtCrhc9GCuPihS-MXz8UOhOEpmRhxyThX6M9KBwICfdnCgPGU2P6PGHjcmHvKiElLOZOwsOoMKFaaDEO1ghLvxJqjZpvhE3rhf5aobxO2GfUbjI5m4X0H80u2wRru1C4S8wfCD37hRMNJrtRuNoquL7Y7tv32z6w62qbXsUkBqsrKiOVBcUpa4sLgiXhivJIsLi8KFgYLo2UFq5YnZcWSssMpaalpoRCeV-G3gPf5uEV\""
+        "crash-reporting\u003d\"/web-reports?context\u003deJwNzX9M1HUcx3G-PDd23cHdffnefb_fz-drWyMqzZ0eKKzyqqVmhpNYrmKBQyBiLDj0vDtlM2v9WLARQ4dzZEqb0xghf2TZjBSWMVzDtOOPGD_M3LI5CBcRosTq88djr_d7e7_3cg9m5G6NauWPxbTWLXFt4XRcO9Mf12YeSmplOUmt_tf92gl_aXrTHTdlqz2MFnmYKfbwVrmHc5976P_Sw9QfHtYnMrnQmUX3eS8lw14OKbPLXgqf9pGs8eFJ-vikxUfeUR_Wjz4u5PpJHfMzeddPW4HOp6_oTFXobK_VOXBA5wNlY5vOQI-O06dTel5nxW2dm4s6_xVls70smw0plY5BqMBg8SUDd6PB7-8alB8x-O6swZYxg445g3-XDPZkBiixAhTkBaiKBzjYGaDvswAzwwGiIwEaxgMcTwuy2QzysB3kqhPkuR1Bos1BtCNBrlwJ8q1ukmuYLK01qcwzcRWbtFebjNSbLO41uZQw6X7PpGPYpFfpvG0yn26RzLIYXGXR96JF7-sW9_ZbzLZYfHjRwjVgcf17i4khi4ZJlVMWqTmL5b8tDt21-HjRQrtvscltU2LbiIhNR6nNyC6bfS02h5WbbTaRoza7Ttikum2yz9pM_2DTctlm6Cebtl9stDGbLuVWumATgsEMQb9XsDJbMJQvYL3anxR0bhD0RgTPPiMY3yiY3yEYrhS8v0dwOiaYOChYeEfNxwTTpwTJLwRzfQLXV4LZc4LmfvV7SZB7TfDzmKBrXP1cFzxwQ1D7m6BO6b4laJgRXL2jbucEMk0SUQJZkokHJTwi-eZxyYiyOiR5fq3kBaVICUck14olza9KtNckQxWSiw2Sjxol92OSwoRkXZOkQHm7VbKzXXL4uKS4S_JUj-pRdn8taR9VHZOSpT8lf81LLi9INt-T1Locct0OL3sdVvgdtuoO25SeHIfWVQ7_rHM4uc1heafD9KNpGXtXpmVkZ7q6z6RGM_w3xloHtJxQU2MinqiqWbOvpir0ZqwxGg_VRN8IVcfq4nXVlfUV-eH8wvAT4fw14YKK3eH_AcmEAfY\""
       ],
       "server": [
         "ESF"
       ],
       "set-cookie": [
-        "YSC\u003d3_bWIGbdxJw; Domain\u003d.youtube.com; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone",
-        "VISITOR_INFO1_LIVE\u003d; Domain\u003d.youtube.com; Expires\u003dTue, 02-May-2023 18:05:05 GMT; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone"
+        "__Secure-YENID\u003d17.YTE\u003djLC8VdKyrv5MrkNawtm_BS9qiIo1rr9OeSAFi75Yrz9VWA7WV09D9QNKD9FQMBDMoN-qlV5nRMzmKQ4V6rH6zNPIPoFFCUIcp_vSF7KQOrABp5IXNIBm_OqbKinvnKlYwIK4OQ3_DzFRT7zGvBfMoHcqngyLqVf_DSZD22OU0-99JNaysi94wA4AynI2TUrKE4OsTjItOZNFni1yLGEg1imJvX18pEDf_FBBZUTT7WALocFUTttEKF_a2dTaESS9IbNlJx-Di14hP1OLpgvWC90YtEHRcAVz_yEJauPloT6MFwZ6aPUAwX0TA_mDTyv1ATxFLG3cdT4Vp6hKhUcgKA; expires\u003dSun, 05-Sep-2027 14:14:00 GMT; path\u003d/; domain\u003d.youtube.com; Secure; HttpOnly; SameSite\u003dlax",
+        "YSC\u003d-5pEBDDrxTY; Domain\u003d.youtube.com; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone",
+        "VISITOR_INFO1_LIVE\u003d; Domain\u003d.youtube.com; Expires\u003dFri, 10-Nov-2023 14:14:00 GMT; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone"
       ],
       "strict-transport-security": [
         "max-age\u003d31536000"
       ],
       "vary": [
-        "Sec-CH-Viewport-Width, Sec-CH-DPR"
+        "Sec-CH-Viewport-Width, Sec-CH-DPR, Device-Memory"
       ],
       "x-content-type-options": [
         "nosniff"

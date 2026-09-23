@@ -23,7 +23,7 @@
     "responseMessage": "",
     "responseHeaders": {
       "accept-ch": [
-        "Sec-CH-Viewport-Width, Sec-CH-DPR"
+        "Sec-CH-Viewport-Width, Sec-CH-DPR, Device-Memory"
       ],
       "access-control-allow-credentials": [
         "true"
@@ -39,10 +39,8 @@
       ],
       "content-security-policy": [
         "script-src \u0027unsafe-eval\u0027 \u0027self\u0027 \u0027unsafe-inline\u0027 https://www.google.com https://apis.google.com https://ssl.gstatic.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://*.youtube.com https://*.google.com https://*.gstatic.com https://youtube.com https://www.youtube.com https://google.com https://*.doubleclick.net https://*.googleapis.com https://www.googleadservices.com https://tpc.googlesyndication.com https://www.youtubekids.com https://www.youtube-nocookie.com https://www.youtubeeducation.com https://www-onepick-opensocial.googleusercontent.com;report-uri https://csp.withgoogle.com/csp/youtube_main/allowlist",
-        "require-trusted-types-for \u0027script\u0027"
-      ],
-      "content-security-policy-report-only": [
-        "report-uri https://csp.withgoogle.com/csp/youtube_main/strict;base-uri \u0027self\u0027;object-src \u0027none\u0027;script-src \u0027nonce-MSXSu_3aJyBQ2TkJHTYdXA\u0027 \u0027unsafe-inline\u0027 \u0027strict-dynamic\u0027 https: http: \u0027unsafe-eval\u0027"
+        "require-trusted-types-for \u0027script\u0027",
+        "base-uri \u0027self\u0027;object-src \u0027none\u0027;script-src \u0027nonce-tBYXAawgGrghpHPkFPT0oA\u0027 \u0027unsafe-inline\u0027 \u0027strict-dynamic\u0027 https: http: \u0027unsafe-eval\u0027;report-uri https://csp.withgoogle.com/csp/youtube_main/strict"
       ],
       "content-type": [
         "text/javascript; charset\u003dutf-8"
@@ -51,13 +49,13 @@
         "same-origin; report-to\u003d\"youtube_main\""
       ],
       "date": [
-        "Mon, 26 Jan 2026 17:59:48 GMT"
+        "Thu, 06 Aug 2026 16:23:08 GMT"
       ],
       "document-policy": [
         "include-js-call-stacks-in-crash-reports"
       ],
       "expires": [
-        "Mon, 26 Jan 2026 17:59:48 GMT"
+        "Thu, 06 Aug 2026 16:23:08 GMT"
       ],
       "origin-trial": [
         "AmhMBR6zCLzDDxpW+HfpP67BqwIknWnyMOXOQGfzYswFmJe+fgaI6XZgAzcxOrzNtP7hEDsOo1jdjFnVr2IdxQ4AAAB4eyJvcmlnaW4iOiJodHRwczovL3lvdXR1YmUuY29tOjQ0MyIsImZlYXR1cmUiOiJXZWJWaWV3WFJlcXVlc3RlZFdpdGhEZXByZWNhdGlvbiIsImV4cGlyeSI6MTc1ODA2NzE5OSwiaXNTdWJkb21haW4iOnRydWV9",
@@ -73,20 +71,21 @@
         "{\"group\":\"youtube_main\",\"max_age\":2592000,\"endpoints\":[{\"url\":\"https://csp.withgoogle.com/csp/report-to/youtube_main\"}]}"
       ],
       "reporting-endpoints": [
-        "default\u003d\"/web-reports?context\u003deJwN0VlIlGEUxvE-_1QyYzPzfe97yjIozIioidHKi2ihzSKwpI1Ka8wt2mbCximjnVaIFlq1fSEjW6AoMLNVkhbaVIrIgkpskaKkEirsvfjxcM65eC6Oq7q9alxoBdsWW0njQ1ZWn0Jr7JOl1ra0iPXrdMQ6XxmxmntGrczEqHWgPmotervcOuKbEbO824yYylkuCgpc_Cxx8f21i-JvLjL7uamd4KZ5opsFWW6ulrmpvOSmocnNoKI4PmV0oqqkE_2nejhT4SGjxsMu4-s_D6nDvETzvbijXkq3ekne7yX2uJcuD7xUJfkYku4jNtuHy3h-0Mfr32Zu8zFb2WQPttluHJpm0xC0SZ9ns3KlzQZj1Habm2dtEi7YqDqb7p9s3rXavEpzaJvgUDbZIT3ToSnscOemw7DHDkOfO_R-4RDf6hDbUTGxmyI9QVHeQ6ESFaOTFP7BitZJCldYsdvYWKhoXKsYuVkxc69iRZki5pzivnH9siL7muL2Q0V1nSLtpaLY6P1FseeH4u8fxTqPJiCajC6a-FTN4zTNDyMxT5MT0UzfqVldorlhXDhm7ic1tcbTUyaNfec0nys1s6o06oZm7C1N7l3NvRpNs3H2vmbxI03FU82XZ0atZku9pvyl2b_S9P2gCTdpgj81h9sJI9oLf-KE7j5hpiPUa2FMZ6FXvLDAONpVeJIgVPQT9vcXWoxHfuF4QGgYJzQbo6YIm-YIpQuF6yHhfVToUyxUGVmrhHVGi7FijdC4XghtEY4YX7cJA3cIk3aZ_t2CtVfIOyDm70LdMaH6hHCxXKgxhl8RnLjYPS_ePOzg-_i3pTQm0V8cLooU5eQPWJaf4y8oDIci_vxQnj-3cH5kfu7cRcGUQEpqIDkleUAgEFwS-A96G-DG\""
+        "crash-reporting\u003d\"/web-reports?context\u003deJwNy3tMlXUAxnFevhvDc4Rz3vNefu_v99rWiC7ajh7JQ7UoGjgyTWK5yiLHrZOxuBidc8SNWeuyZENGjZbkhbY2OnOTti52YaTLIc1h5mEuxsXuNtYJF5FihPX-8dnz_PE8vkM5hZtatKdubdO6KuLalYG4dmworj10IaF1LCe0zI1JrbogqTV9364dCW7Pbr_so_p2P-Ob_WQq_Rx_38_Qh35mfvMTTaxkuC-P1Of5VI3m84Znbjmf4nsDJGMB_MkA73QGWP92AHEmwHBhkPTBINNXg9RGdbo9hx7VmanR2bpTp6ND51VPWbfOiaM67qDOqlmdnxZ1_tscYmt1iHvSXroG4ajB4sMGTzxn4Gs1-PUlg7rPDComDHrnDf5dMqgSJvVxk719JoPvmmRGTVrGTJonTX65bnI4y-KAabHRtrjJsTjnWlSUWpRts9Desjh71uIL3WZpnU3depvcSpueBpuxJpvFF2xSL9v0jtr0zdosZAuSeYKTqwWDDwqOPSm41i6Y6xS89qUg94Tg4leCqRFB87SXM4L0vGD5L8H-RYH2j6Dc51DlOMgSh97tDmO1Drs7HX7udqg94pBOOYQ-cuj82uH0Nw7d3zloEw79nkvZknIkJ3MkQ_mS20KSkSKv3y35oERSep9kskyysE0yWid55XnJe22Sqb2SKy9K7t8vGTgoiaYk84OS3I8lpzxzxyX7hrz_KYl1WnJ-QtI_6f0uSlb8INn5o6TRk7okac5Izl32tvMSlaUo8Zh5iqkbFNysGFuj2LhO8YBniydSovi2UrHvMYX2uGKkRrEQUww3K15vVYTjiuKEYsMexZ2e0i7Fjh7Fm4cVlf2KXZ8oVpxX9IwrPp1WLP2h-HNBUX5NcWFZUehzeSTfZVXQZZPussVztMCla7VLaI3L33e4FG5wub7D5cyzLr_fkpUTWpmbmU2P5wQPXO0boCC8pzURT9TH1u6O1YefaWttiYdjLU-HG9oa440NdU01RZGi4shdkaK1kWjNrsj_Fnf5XQ\""
       ],
       "server": [
         "ESF"
       ],
       "set-cookie": [
-        "YSC\u003d6eDDO2AzH5Q; Domain\u003d.youtube.com; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone",
-        "VISITOR_INFO1_LIVE\u003d; Domain\u003d.youtube.com; Expires\u003dTue, 02-May-2023 17:59:48 GMT; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone"
+        "__Secure-YENID\u003d17.YTE\u003dXoKEKEwCjG8ZnGby1pX2ruXQ9sjjZD0z7Bb_ITjjs-9w1-eOId777nvP_s0ITeKih4S0IEPQ1ZrNu5z8Gj5U_Fxn6Z1DR7FLWTYN9rrlM_uR7W_w_9CbCAzPMYhNUReSQy7LjswdmhQ8UzZ1PdTtqV22gUlJnYXg4mQg2DRPw4nWv2WHVQBmlEMZs2b3PbHIUneeHzUnJH-Li7FC3tZc-URoj7NSsqEYr_jvt2Qwz0TJS1LqFcRTuhKywNVOsQf1VZy0pDZv5uGhhMQQ8PNh2NV9lyaO2Y-lx9NWrJ64U7WD7E9sg5Kbwl0DynZsMfwrAps9fm8tdYTDmSsPoPfwAA; expires\u003dSun, 05-Sep-2027 16:23:08 GMT; path\u003d/; domain\u003d.youtube.com; Secure; HttpOnly; SameSite\u003dlax",
+        "YSC\u003dNskUddIp9kg; Domain\u003d.youtube.com; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone",
+        "VISITOR_INFO1_LIVE\u003d; Domain\u003d.youtube.com; Expires\u003dFri, 10-Nov-2023 16:23:08 GMT; Path\u003d/; Secure; HttpOnly; SameSite\u003dnone"
       ],
       "strict-transport-security": [
         "max-age\u003d31536000"
       ],
       "vary": [
-        "Sec-CH-Viewport-Width, Sec-CH-DPR"
+        "Sec-CH-Viewport-Width, Sec-CH-DPR, Device-Memory"
       ],
       "x-content-type-options": [
         "nosniff"

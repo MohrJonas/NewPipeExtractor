@@ -109,7 +109,7 @@ public class SoundcloudStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public Description getDescription() {
-        return new Description(track.getString("description"), Description.PLAIN_TEXT);
+        return Description.of(track.getString("description"), Description.Type.PLAIN_TEXT);
     }
 
     @Override
@@ -204,9 +204,7 @@ public class SoundcloudStreamExtractor extends StreamExtractor {
 
     private void extractAudioStreams(@Nonnull final JsonArray transcodings,
                                      final List<AudioStream> audioStreams) {
-        transcodings.stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+        transcodings.streamAsJsonObjects()
                 .forEachOrdered(transcoding -> {
                     final String url = transcoding.getString("url");
                     if (isNullOrEmpty(url)) {

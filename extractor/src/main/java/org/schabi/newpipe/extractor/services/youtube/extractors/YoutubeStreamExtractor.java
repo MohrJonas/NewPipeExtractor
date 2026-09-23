@@ -23,8 +23,11 @@ package org.schabi.newpipe.extractor.services.youtube.extractors;
 import static org.schabi.newpipe.extractor.services.youtube.ItagItem.APPROX_DURATION_MS_UNKNOWN;
 import static org.schabi.newpipe.extractor.services.youtube.ItagItem.CONTENT_LENGTH_UNKNOWN;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeDescriptionHelper.attributedDescriptionToHtml;
+import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.BADGES;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.CONTENT_CHECK_OK;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.CPN;
+import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.LABEL;
+import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.METADATA_BADGE_RENDERER;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.RACY_CHECK_OK;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.VIDEO_ID;
 import static org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper.fixThumbnailUrl;
@@ -63,7 +66,6 @@ import org.schabi.newpipe.extractor.localization.TimeAgoParser;
 import org.schabi.newpipe.extractor.localization.TimeAgoPatternsManager;
 import org.schabi.newpipe.extractor.services.youtube.ItagItem;
 import org.schabi.newpipe.extractor.services.youtube.PoTokenProvider;
-import org.schabi.newpipe.extractor.services.youtube.PoTokenResult;
 import org.schabi.newpipe.extractor.services.youtube.YoutubeJavaScriptPlayerManager;
 import org.schabi.newpipe.extractor.services.youtube.YoutubeMetaInfoHelper;
 import org.schabi.newpipe.extractor.services.youtube.YoutubeParsingHelper;
@@ -91,13 +93,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -121,17 +121,11 @@ public class YoutubeStreamExtractor extends StreamExtractor {
     private static final String VIDEO_DETAILS = "videoDetails";
     private static final String TITLE = "title";
 
-    @Nullable
-    private static PoTokenProvider poTokenProvider;
-    private static boolean fetchIosClient;
-
     private JsonObject playerResponse;
     private JsonObject nextResponse;
 
     @Nullable
-    private JsonObject iosStreamingData;
-    @Nullable
-    private JsonObject androidStreamingData;
+    private JsonObject visionOsStreamingData;
 
     private JsonObject videoPrimaryInfoRenderer;
     private JsonObject videoSecondaryInfoRenderer;
@@ -145,13 +139,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
     // URLs (with the cpn parameter).
     // Also because a nonce should be unique, it should be different between clients used, so
     // three different strings are used.
-    private String iosCpn;
-    private String androidCpn;
-
-    @Nullable
-    private String androidStreamingUrlsPoToken;
-    @Nullable
-    private String iosStreamingUrlsPoToken;
+    private String visionOsCpn;
 
     public YoutubeStreamExtractor(final StreamingService service, final LinkHandler linkHandler) {
         super(service, linkHandler);
@@ -274,13 +262,13 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 getVideoSecondaryInfoRenderer().getObject("description"),
                 true);
         if (!isNullOrEmpty(videoSecondaryInfoRendererDescription)) {
-            return new Description(videoSecondaryInfoRendererDescription, Description.HTML);
+            return new Description(videoSecondaryInfoRendererDescription, Description.Type.HTML);
         }
 
         final String attributedDescription = attributedDescriptionToHtml(
                 getVideoSecondaryInfoRenderer().getObject("attributedDescription"));
         if (!isNullOrEmpty(attributedDescription)) {
-            return new Description(attributedDescription, Description.HTML);
+            return new Description(attributedDescription, Description.Type.HTML);
         }
 
         String description = playerResponse.getObject(VIDEO_DETAILS)
@@ -291,7 +279,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
         }
 
         // Raw non-html description
-        return new Description(description, Description.PLAIN_TEXT);
+        return Description.of(description, Description.Type.PLAIN_TEXT);
     }
 
     @Override
@@ -304,23 +292,14 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 .getObject("metadataRowContainer")
                 .getObject("metadataRowContainerRenderer")
                 .getArray("rows")
-                .stream()
-                // Only JsonObjects allowed
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+                .streamAsJsonObjects()
                 .flatMap(metadataRow -> metadataRow
                         .getObject("metadataRowRenderer")
                         .getArray("contents")
-                        .stream()
-                        // Only JsonObjects allowed
-                        .filter(JsonObject.class::isInstance)
-                        .map(JsonObject.class::cast))
+                        .streamAsJsonObjects())
                 .flatMap(content -> content
                         .getArray("runs")
-                        .stream()
-                        // Only JsonObjects allowed
-                        .filter(JsonObject.class::isInstance)
-                        .map(JsonObject.class::cast))
+                        .streamAsJsonObjects())
                 .map(run -> run.getString("text", ""))
                 .anyMatch(rowText -> rowText.contains("Age-restricted"));
 
@@ -337,8 +316,8 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                     .getString("lengthSeconds");
             return Long.parseLong(duration);
         } catch (final Exception e) {
-            return getDurationFromFirstAdaptiveFormat(Arrays.asList(
-                    androidStreamingData, iosStreamingData));
+            return getDurationFromFirstAdaptiveFormat(Collections.singletonList(
+                    visionOsStreamingData));
         }
     }
 
@@ -432,9 +411,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
     private static long parseLikeCountFromLikeButtonRenderer(
             @Nonnull final JsonArray topLevelButtons) throws ParsingException {
         String likesString = null;
-        final JsonObject likeToggleButtonRenderer = topLevelButtons.stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+        final JsonObject likeToggleButtonRenderer = topLevelButtons.streamAsJsonObjects()
                 .map(button -> button.getObject("segmentedLikeDislikeButtonRenderer")
                         .getObject("likeButton")
                         .getObject("toggleButtonRenderer"))
@@ -447,12 +424,12 @@ public class YoutubeStreamExtractor extends StreamExtractor {
             // one used for comments' like count extraction)
             likesString = likeToggleButtonRenderer.getObject("accessibilityData")
                     .getObject("accessibilityData")
-                    .getString("label");
+                    .getString(LABEL);
 
             // Use the other accessibility string available which contains the exact like count
             if (likesString == null) {
                 likesString = likeToggleButtonRenderer.getObject("accessibility")
-                        .getString("label");
+                        .getString(LABEL);
             }
 
             // Last method: use the defaultText's accessibility data, which contains the exact like
@@ -461,7 +438,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 likesString = likeToggleButtonRenderer.getObject("defaultText")
                         .getObject("accessibility")
                         .getObject("accessibilityData")
-                        .getString("label");
+                        .getString(LABEL);
             }
 
             // This check only works with English localizations!
@@ -486,9 +463,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
     private static long parseLikeCountFromLikeButtonViewModel(
             @Nonnull final JsonArray topLevelButtons) throws ParsingException {
         // Try first with the current video actions buttons data structure
-        final JsonObject likeToggleButtonViewModel = topLevelButtons.stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+        final JsonObject likeToggleButtonViewModel = topLevelButtons.streamAsJsonObjects()
                 .map(button -> button.getObject("segmentedLikeDislikeButtonViewModel")
                         .getObject("likeButtonViewModel")
                         .getObject("likeButtonViewModel")
@@ -559,9 +534,9 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                         .getObject("owner")
                         .getObject("videoOwnerRenderer");
 
-        if (videoOwnerRenderer.has("badges")) {
+        if (videoOwnerRenderer.has(BADGES)) {
             return YoutubeParsingHelper.isVerified(videoOwnerRenderer
-                .getArray("badges"));
+                .getArray(BADGES));
         }
 
 
@@ -634,32 +609,16 @@ public class YoutubeStreamExtractor extends StreamExtractor {
 
     @Nonnull
     @Override
-    public String getDashMpdUrl() throws ParsingException {
-        assertPageFetched();
-
-        // There is no DASH manifest available with the iOS client
-        return getManifestUrl(
-                "dash",
-                List.of(new Pair<>(androidStreamingData, androidStreamingUrlsPoToken)),
-                // Return version 7 of the DASH manifest, which is the latest one, reducing
-                // manifest size and allowing playback with some DASH players
-                "mpd_version=7");
-    }
-
-    @Nonnull
-    @Override
     public String getHlsUrl() throws ParsingException {
         assertPageFetched();
 
-        // Return HLS manifest of the iOS client first because on livestreams, the HLS manifest
-        // returned has separated audio and video streams and poTokens requirement do not seem to
-        // impact HLS formats (if a poToken is provided, it is added)
-        // Also, on videos, non-iOS clients don't have an HLS manifest URL in their player response
-        // unless a Safari macOS user agent is used
+        // Return HLS manifest of an Apple client first because on livestreams, the HLS manifest
+        // returned has separated audio and video streams
+        // Also, on videos, non-Apple clients don't have an HLS manifest URL in their player
+        // response
         return getManifestUrl(
                 "hls",
-                List.of(new Pair<>(iosStreamingData, iosStreamingUrlsPoToken),
-                        new Pair<>(androidStreamingData, androidStreamingUrlsPoToken)),
+                List.of(new Pair<>(visionOsStreamingData, null)),
                 "");
     }
 
@@ -791,9 +750,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                     .getArray("results");
 
             final TimeAgoParser timeAgoParser = getTimeAgoParser();
-            results.stream()
-                    .filter(JsonObject.class::isInstance)
-                    .map(JsonObject.class::cast)
+            results.streamAsJsonObjects()
                     .map(result -> {
                         if (result.has("compactVideoRenderer")) {
                             return new YoutubeStreamInfoItemExtractor(
@@ -853,21 +810,8 @@ public class YoutubeStreamExtractor extends StreamExtractor {
         final Localization localization = getExtractorLocalization();
         final ContentCountry contentCountry = getExtractorContentCountry();
 
-        final PoTokenProvider poTokenProviderInstance = poTokenProvider;
-        final boolean noPoTokenProviderSet = poTokenProviderInstance == null;
-
-        final PoTokenResult androidPoTokenResult = noPoTokenProviderSet ? null
-                : poTokenProviderInstance.getAndroidClientPoToken(videoId);
-
-        fetchAndroidClient(localization, contentCountry, videoId, androidPoTokenResult);
-
+        fetchVisionOsClient(localization, contentCountry, videoId);
         setStreamType();
-
-        if (fetchIosClient) {
-            final PoTokenResult iosPoTokenResult = noPoTokenProviderSet ? null
-                    : poTokenProviderInstance.getIosClientPoToken(videoId);
-            fetchIosClient(localization, contentCountry, videoId, iosPoTokenResult);
-        }
 
         fetchWebClientMetadataAndSetThumbnails(localization, contentCountry, videoId);
 
@@ -897,7 +841,12 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                             "This age-restricted video cannot be watched anonymously");
                 }
 
-                if (reason.contains("private")) {
+                if (playabilityStatus.getArray("messages")
+                        .stream()
+                        .filter(String.class::isInstance)
+                        .map(String.class::cast)
+                        .anyMatch(message -> !isNullOrEmpty(message)
+                                && message.contains("private"))) {
                     throw new PrivateContentException("This video is private");
                 }
 
@@ -936,63 +885,24 @@ public class YoutubeStreamExtractor extends StreamExtractor {
         throw new ContentNotAvailableException("Got error " + status + ": \"" + reason + "\"");
     }
 
-    private void fetchAndroidClient(@Nonnull final Localization localization,
-                                    @Nonnull final ContentCountry contentCountry,
-                                    @Nonnull final String videoId,
-                                    @Nullable final PoTokenResult androidPoTokenResult)
-            throws IOException, ExtractionException {
-        androidCpn = generateContentPlaybackNonce();
+    private void fetchVisionOsClient(@Nonnull final Localization localization,
+                                     @Nonnull final ContentCountry contentCountry,
+                                     @Nonnull final String videoId) throws IOException,
+            ExtractionException {
+        visionOsCpn = generateContentPlaybackNonce();
 
-        if (androidPoTokenResult == null) {
-            playerResponse = YoutubeStreamHelper.getAndroidReelPlayerResponse(
-                    contentCountry, localization, videoId, androidCpn);
-        } else {
-            playerResponse = YoutubeStreamHelper.getAndroidPlayerResponse(
-                    contentCountry, localization, videoId, androidCpn,
-                    androidPoTokenResult);
-        }
+        playerResponse = YoutubeStreamHelper.getVisionOsPlayerResponse(contentCountry,
+                localization, videoId, visionOsCpn);
 
         checkPlayabilityStatus(playerResponse.getObject(PLAYABILITY_STATUS));
         if (isPlayerResponseNotValid(playerResponse, videoId)) {
-            throw new ExtractionException("ANDROID player response is not valid");
+            throw new ExtractionException("VISIONOS player response is not valid");
         }
 
-        androidStreamingData = playerResponse.getObject(STREAMING_DATA);
+        visionOsStreamingData = playerResponse.getObject(STREAMING_DATA);
 
         playerCaptionsTracklistRenderer = playerResponse.getObject(CAPTIONS)
                 .getObject(PLAYER_CAPTIONS_TRACKLIST_RENDERER);
-
-        if (androidPoTokenResult != null) {
-            androidStreamingUrlsPoToken = androidPoTokenResult.streamingDataPoToken;
-        }
-    }
-
-    private void fetchIosClient(@Nonnull final Localization localization,
-                                @Nonnull final ContentCountry contentCountry,
-                                @Nonnull final String videoId,
-                                @Nullable final PoTokenResult iosPoTokenResult) {
-        try {
-            iosCpn = generateContentPlaybackNonce();
-
-            final JsonObject iosPlayerResponse = YoutubeStreamHelper.getIosPlayerResponse(
-                    contentCountry, localization, videoId, iosCpn, iosPoTokenResult);
-
-            if (!isPlayerResponseNotValid(iosPlayerResponse, videoId)) {
-                iosStreamingData = iosPlayerResponse.getObject(STREAMING_DATA);
-
-                if (isNullOrEmpty(playerCaptionsTracklistRenderer)) {
-                    playerCaptionsTracklistRenderer = iosPlayerResponse.getObject(CAPTIONS)
-                            .getObject(PLAYER_CAPTIONS_TRACKLIST_RENDERER);
-                }
-
-                if (iosPoTokenResult != null) {
-                    iosStreamingUrlsPoToken = iosPoTokenResult.streamingDataPoToken;
-                }
-            }
-        } catch (final Exception ignored) {
-            // Ignore exceptions related to IOS client fetch or parsing, as it is not
-            // compulsory to play contents
-        }
     }
 
     private void fetchWebClientMetadataAndSetThumbnails(
@@ -1026,7 +936,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 }
             }
         } catch (final Exception e) {
-            // Ignore exceptions related to WEB client fetch or parsing, as it is not
+            // Ignore exceptions related to WEB client fetching or parsing, as it is not
             // compulsory to play contents
             // Set thumbnails from playerResponse
             playerMicroFormatRenderer = new JsonObject();
@@ -1104,9 +1014,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                 .getObject("results")
                 .getObject("results")
                 .getArray("contents")
-                .stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+                .streamAsJsonObjects()
                 .filter(content -> content.has(videoRendererName))
                 .map(content -> content.getObject(videoRendererName))
                 .findFirst()
@@ -1124,10 +1032,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
             final List<T> streamList = new ArrayList<>();
 
             java.util.stream.Stream.of(
-                    new Pair<>(androidStreamingData,
-                            new Pair<>(androidCpn, androidStreamingUrlsPoToken)),
-                    new Pair<>(iosStreamingData,
-                            new Pair<>(iosCpn, iosStreamingUrlsPoToken)))
+                    new Pair<>(visionOsStreamingData, new Pair<>(visionOsCpn, (String) null)))
                     .flatMap(pair -> getStreamsFromStreamingDataKey(
                             videoId,
                             pair.getFirst(),
@@ -1274,9 +1179,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
             return java.util.stream.Stream.empty();
         }
 
-        return streamingData.getArray(streamingDataKey).stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+        return streamingData.getArray(streamingDataKey).streamAsJsonObjects()
                 .map(formatData -> {
                     try {
                         final ItagItem itagItem = ItagItem.getItag(formatData.getInt("itag"));
@@ -1382,11 +1285,13 @@ public class YoutubeStreamExtractor extends StreamExtractor {
                             audioTrackId.substring(0, audioTrackIdLastLocaleCharacter)
                     ).ifPresent(itagItem::setAudioLocale);
                 }
-                itagItem.setAudioTrackType(YoutubeParsingHelper.extractAudioTrackType(streamUrl));
+                itagItem.setAudioTrackType(
+                        YoutubeParsingHelper.extractAudioTrackType(itagItem.getXtags()));
             }
 
-            itagItem.setAudioTrackName(formatData.getObject("audioTrack")
-                    .getString("displayName"));
+            final JsonObject audioTrack = formatData.getObject("audioTrack");
+            itagItem.setAudioTrackName(audioTrack.getString("displayName"));
+            itagItem.setAutoGenerated(audioTrack.getBoolean("isAutoDubbed", false));
         }
 
         // YouTube return the content length and the approximate duration as strings
@@ -1491,10 +1396,10 @@ public class YoutubeStreamExtractor extends StreamExtractor {
     @Override
     public Privacy getPrivacy() {
         return playerMicroFormatRenderer.getBoolean("isUnlisted")
-                || getVideoPrimaryInfoRenderer().getArray("badges")
+                || getVideoPrimaryInfoRenderer().getArray(BADGES)
                 .streamAsJsonObjects()
                 .anyMatch(badge ->
-                        "PRIVACY_UNLISTED".equals(badge.getObject("metadataBadgeRenderer")
+                        "PRIVACY_UNLISTED".equals(badge.getObject(METADATA_BADGE_RENDERER)
                                 .getObject("icon")
                                 .getString("iconType")))
                 ? Privacy.UNLISTED
@@ -1546,10 +1451,7 @@ public class YoutubeStreamExtractor extends StreamExtractor {
         }
 
         final JsonArray segmentsArray = nextResponse.getArray("engagementPanels")
-                .stream()
-                // Check if object is a JsonObject
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
+                .streamAsJsonObjects()
                 // Check if the panel is the correct one
                 .filter(panel -> "engagement-panel-macro-markers-description-chapters".equals(
                         panel
@@ -1571,12 +1473,12 @@ public class YoutubeStreamExtractor extends StreamExtractor {
 
         final long duration = getLength();
         final List<StreamSegment> segments = new ArrayList<>();
-        for (final JsonObject segmentJson : segmentsArray.stream()
-                .filter(JsonObject.class::isInstance)
-                .map(JsonObject.class::cast)
-                .map(object -> object.getObject("macroMarkersListItemRenderer"))
-                .collect(Collectors.toList())
-        ) {
+        final var segmentStream = segmentsArray.streamAsJsonObjects()
+                .map(object -> object.getObject("macroMarkersListItemRenderer"));
+        final var it = segmentStream.iterator();
+
+        while (it.hasNext()) {
+            final var segmentJson = it.next();
             final int startTimeSeconds = segmentJson.getObject("onTap")
                     .getObject("watchEndpoint").getInt("startTimeSeconds", -1);
 
@@ -1625,6 +1527,11 @@ public class YoutubeStreamExtractor extends StreamExtractor {
      * Set the {@link PoTokenProvider} instance to be used for fetching {@code poToken}s.
      *
      * <p>
+     * <b>This method currently doesn't do anything, as the extractor doesn't use any client
+     * supporting poTokens until SABR support is added to the extractor.</b>
+     * </p>
+     *
+     * <p>
      * This method allows setting an implementation of {@link PoTokenProvider} which will be used
      * to obtain poTokens required for YouTube player requests and streaming URLs. These tokens
      * are used by YouTube to verify the integrity of the user's device or browser and are required
@@ -1647,26 +1554,6 @@ public class YoutubeStreamExtractor extends StreamExtractor {
      */
     @SuppressWarnings("unused")
     public static void setPoTokenProvider(@Nullable final PoTokenProvider poTokenProvider) {
-        YoutubeStreamExtractor.poTokenProvider = poTokenProvider;
-    }
-
-    /**
-     * Set whether to fetch the iOS player responses.
-     *
-     * <p>
-     * This method allows fetching the iOS player response, which can be useful in scenarios where
-     * streams from the iOS player response are needed, especially HLS manifests.
-     * </p>
-     *
-     * <p>
-     * Note that at the time of writing, YouTube is rolling out a {@code poToken} requirement on
-     * this client, formats from HLS manifests do not seem to be affected.
-     * </p>
-     *
-     * @param fetchIosClient whether to fetch the iOS client
-     */
-    @SuppressWarnings("unused")
-    public static void setFetchIosClient(final boolean fetchIosClient) {
-        YoutubeStreamExtractor.fetchIosClient = fetchIosClient;
+        // Nothing to do for now, see why in the Javadoc
     }
 }

@@ -229,13 +229,14 @@ public class YoutubeSearchExtractorTest {
                     "COVID-19",
                     new Description(
                             "Get the latest information from the WHO about coronavirus.",
-                            Description.PLAIN_TEXT),
+                            Description.Type.PLAIN_TEXT),
                     Collections.singletonList(
                             new URL("https://www.who.int/emergencies/diseases/novel-coronavirus-2019")),
                     Collections.singletonList("Learn more")
             ));
         }
-        // testMoreRelatedItems is broken because a video has no duration shown
+        // testMoreRelatedItems: a video in this mock has no duration badge; getDuration() now
+        // returns -1 instead of throwing, but the mock may need re-recording before re-enabling.
         @Test @Override public void testMoreRelatedItems() { }
         @Override public StreamingService expectedService() { return YouTube; }
         @Override public String expectedName() { return QUERY; }
