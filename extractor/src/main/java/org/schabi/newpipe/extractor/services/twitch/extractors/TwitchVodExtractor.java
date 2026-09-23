@@ -9,6 +9,7 @@ import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.stream.AudioStream;
@@ -70,9 +71,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderUrl() throws ParsingException {
-        if(cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getUploaderUrl();
-        return "???";
+        return TwitchUrlBuilder.buildChannelUrlFromChannelName(getUploaderName());
     }
 
     @Nonnull
@@ -97,7 +96,7 @@ public class TwitchVodExtractor extends StreamExtractor {
                                 .setDeliveryMethod(DeliveryMethod.HLS)
                                 .setResolution(res.getResolution())
                                 .setIsVideoOnly(false)
-                                .setMediaFormat(MediaFormat.MPEG_4)
+                                .setMediaFormat(MediaFormat.MP2)
                                 .build()
                 )
                 .collect(Collectors.toList());

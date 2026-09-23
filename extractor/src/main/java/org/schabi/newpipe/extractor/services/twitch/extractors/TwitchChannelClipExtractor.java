@@ -12,10 +12,10 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponseInner;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchClipId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -42,7 +42,7 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
     @Override
     public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
         return new InfoItemsPage<>(Arrays.stream(response).map(res -> {
-            final var item = new StreamInfoItem(getServiceId(), new TwitchClipId(res.getClipId()).toString(), res.getClipTitle(), StreamType.NONE);
+            final var item = new StreamInfoItem(getServiceId(), TwitchUrlBuilder.buildClipUrlFromClipId(res.getClipId()), res.getClipTitle(), StreamType.NONE);
             item.setThumbnails(List.of(new Image(res.getVodThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)));
             try {
                 item.setUploaderName(getId() + " + " + res.getClipperName());
@@ -56,7 +56,7 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
                 item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
             } catch (ParsingException ignored) {
             }
-            cache.put(new TwitchClipId(res.getClipId()).toString(), item);
+            cache.put("", item);
             return item;
         }).collect(Collectors.toList()), null, Collections.emptyList());
     }
@@ -69,8 +69,8 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
-            final var channelId = TwitchChannelId.fromString(getUrl());
-            response = TwitchApi.getTwitchClips(downloader, channelId.getChannelName()).getData();
+            final var channelName = TwitchUrlParser.parseChannelNameFromChannelUrl(getUrl());
+            response = TwitchApi.getTwitchClips(downloader, channelName).getData();
         } catch (JsonParserException e) {
             throw new IOException(e);
         }

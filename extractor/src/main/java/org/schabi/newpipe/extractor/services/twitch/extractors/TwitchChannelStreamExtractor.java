@@ -11,10 +11,10 @@ import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -37,7 +37,7 @@ public final class TwitchChannelStreamExtractor extends ChannelTabExtractor {
     public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
         var item = new StreamInfoItem(
                 getServiceId(),
-                new TwitchStreamId(response.getStreamerName()).toString(),
+                TwitchUrlBuilder.buildChannelUrlFromChannelName(response.getStreamerName()),
                 response.getStreamTitle(),
                 StreamType.LIVE_STREAM
         );

@@ -2,39 +2,35 @@ package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandlerFactory;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactory {
 
     @Override
     public String getId(String url) throws ParsingException, UnsupportedOperationException {
-        try {
-            return TwitchChannelId.fromString(url).getChannelName();
-        } catch (AssertionError ignored) {
-        }
-        return TwitchStreamId.fromString(url).getStreamId();
+        return TwitchUrlParser.parseChannelNameFromChannelUrl(url);
     }
 
     @Override
     public String getUrl(String id, List<String> contentFilter, String sortFilter) throws ParsingException, UnsupportedOperationException {
-        return new TwitchChannelId(id).toString();
+        return TwitchUrlBuilder.buildChannelUrlFromChannelName(id);
     }
 
     @Override
     public boolean onAcceptUrl(String urlString) throws ParsingException {
-        try {
-            TwitchChannelId.fromString(urlString);
+        try
+        {
+            var channelName = TwitchUrlParser.parseChannelNameFromChannelUrl(urlString);
+            Objects.requireNonNull(channelName);
             return true;
-        } catch (AssertionError ignored) {
         }
-        try {
-            TwitchStreamId.fromString(urlString);
-            return true;
-        } catch (AssertionError ignored) {
+        catch(Exception e)
+        {
+            return false;
         }
-        return false;
     }
 }

@@ -17,7 +17,6 @@ import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandler;
 import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandlerFactory;
 import org.schabi.newpipe.extractor.playlist.PlaylistExtractor;
 import org.schabi.newpipe.extractor.search.SearchExtractor;
-import org.schabi.newpipe.extractor.services.twitch.data.id.TwitchId;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchChannelExtractor;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchClipExtractor;
 import org.schabi.newpipe.extractor.services.twitch.extractors.TwitchSearchExtractor;
@@ -37,9 +36,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
-
 public final class TwitchService extends StreamingService {
+
+    public static final String BaseUrl = "https://twitch.tv";
 
     private final Map<String, StreamInfoItem> streamInfoCache = new HashMap<>();
 
@@ -49,7 +48,7 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public String getBaseUrl() {
-        return "https://twitch.tv";
+        return BaseUrl;
     }
 
     @Override
@@ -135,14 +134,21 @@ public final class TwitchService extends StreamingService {
     @Override
     public StreamExtractor getStreamExtractor(LinkHandler linkHandler) throws ExtractionException {
         final var url = linkHandler.getUrl();
-        switch (TwitchId.getIdTypeFromString(url)) {
-            case CLIP:
-                return new TwitchClipExtractor(this, linkHandler, streamInfoCache);
-            case STREAM:
-                return new TwitchStreamExtractor(this, linkHandler, streamInfoCache);
-            case VOD:
-                return new TwitchVodExtractor(this, linkHandler, streamInfoCache);
+        try {
+            TwitchUrlParser.parseChannelNameFromStreamUrl(url);
+            return new TwitchStreamExtractor(this, linkHandler, streamInfoCache);
         }
+        catch (Exception ignored) {}
+        try {
+            TwitchUrlParser.parseClipIdFromClipUrl(url);
+            return new TwitchClipExtractor(this, linkHandler, streamInfoCache);
+        }
+        catch (Exception ignored) {}
+        try {
+            TwitchUrlParser.parseVodIdFromVodUrl(url);
+            return new TwitchVodExtractor(this, linkHandler, streamInfoCache);
+        }
+        catch (Exception ignored) {}
         throw new ExtractionException("Cannot get StreamExtractor for url " + url);
     }
 

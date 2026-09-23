@@ -10,13 +10,9 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.kiosk.KioskExtractor;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.nowLive.TwitchNowLiveResponse;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchStreamResponseEntry;
-import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchVodResponseEntry;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -62,16 +58,16 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
     public InfoItemsPage<StreamInfoItem> getInitialPage() throws IOException, ExtractionException {
         response.getData()
                 .forEach(searchEntry -> {
-                    final var key = new TwitchStreamId(searchEntry.getStreamerName()).toString();
+                    final var key = TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName());
                     final var value = new StreamInfoItem(
                             getServiceId(),
-                            new TwitchStreamId(searchEntry.getStreamerName()).toString(),
+                            TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName()),
                             searchEntry.getStreamTitle(),
                             StreamType.LIVE_STREAM
                     );
                     value.setViewCount(searchEntry.getStreamViewers());
                     value.setUploaderName(searchEntry.getStreamerName());
-                    value.setUploaderUrl(new TwitchChannelId(searchEntry.getStreamerName()).toString());
+                    value.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName()));
                     value.setShortDescription(searchEntry.getGameName());
                     value.setUploaderAvatars(List.of(new Image(searchEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
                     value.setThumbnails(List.of(new Image(searchEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
@@ -83,13 +79,13 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
                         .map(liveEntry -> {
                             final var infoItem = new StreamInfoItem(
                                     getServiceId(),
-                                    new TwitchStreamId(liveEntry.getStreamerName()).toString(),
+                                    TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.getStreamerName()),
                                     liveEntry.getStreamTitle(),
                                     StreamType.LIVE_STREAM
                             );
                             infoItem.setViewCount(liveEntry.getStreamViewers());
                             infoItem.setUploaderName(liveEntry.getStreamerName());
-                            infoItem.setUploaderUrl(new TwitchChannelId(liveEntry.getStreamerName()).toString());
+                            infoItem.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.getStreamerName()));
                             infoItem.setShortDescription(liveEntry.getGameName());
                             infoItem.setUploaderAvatars(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
                             infoItem.setThumbnails(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));

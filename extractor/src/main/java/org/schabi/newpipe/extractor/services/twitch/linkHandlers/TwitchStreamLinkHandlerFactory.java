@@ -1,61 +1,63 @@
 package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
-import org.schabi.newpipe.extractor.services.twitch.data.id.TwitchId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.TwitchIdType;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchClipId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
-
-import java.util.Set;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
+import org.schabi.newpipe.extractor.services.twitch.data.TwitchStreamLinkType;
 
 public class TwitchStreamLinkHandlerFactory extends TwitchBaseLinkHandlerFactory {
 
-    private static final Set<TwitchIdType> ACCEPTED_IDS = Set.of(
-            TwitchIdType.CLIP,
-            TwitchIdType.STREAM,
-            TwitchIdType.VOD
-    );
-
-    private TwitchIdType idType;
+    private TwitchStreamLinkType type;
 
     @Override
     public String getId(final String urlString) throws ParsingException, UnsupportedOperationException {
-        switch (idType) {
+        switch (type)
+        {
             case CLIP:
-                return TwitchClipId.fromString(urlString).getClipId();
+                return TwitchUrlParser.parseClipIdFromClipUrl(urlString);
             case STREAM:
-                return TwitchStreamId.fromString(urlString).getStreamId();
+                return TwitchUrlParser.parseChannelNameFromStreamUrl(urlString);
             case VOD:
-                return TwitchVodId.fromString(urlString).getVodId();
+                return TwitchUrlParser.parseVodIdFromVodUrl(urlString);
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported .getId call for stream type " + type);
     }
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        switch (idType) {
+        switch (type)
+        {
             case CLIP:
-                return new TwitchClipId(id).toString();
+                return TwitchUrlBuilder.buildClipUrlFromClipId(id);
             case STREAM:
-                return new TwitchStreamId(id).toString();
+                return TwitchUrlBuilder.buildStreamUrlFromChannelName(id);
             case VOD:
-                return new TwitchVodId(id).toString();
+                return TwitchUrlBuilder.buildVodUrlFromVodId(id);
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported .getId call for stream type " + type);
     }
 
     @Override
     public boolean onAcceptUrl(final String urlString) throws ParsingException {
-        try {
-            final var type = TwitchId.getIdTypeFromString(urlString);
-            if (ACCEPTED_IDS.contains(type)) {
-                idType = type;
-                return true;
-            }
-            return false;
-        } catch (Throwable e) {
-            return false;
+        try
+        {
+            TwitchUrlParser.parseClipIdFromClipUrl(urlString);
+            type = TwitchStreamLinkType.CLIP;
+            return true;
         }
+        catch (Exception ignored) {}
+        try {
+            TwitchUrlParser.parseVodIdFromVodUrl(urlString);
+            type = TwitchStreamLinkType.VOD;
+            return true;
+        }
+        catch (Exception ignored) {}
+        try {
+            TwitchUrlParser.parseChannelNameFromStreamUrl(urlString);
+            type = TwitchStreamLinkType.STREAM;
+            return true;
+        }
+        catch (Exception ignored) {}
+        return false;
     }
 }

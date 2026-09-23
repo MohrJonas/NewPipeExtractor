@@ -1,7 +1,7 @@
 package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
+import org.schabi.newpipe.extractor.exceptions.ContentNotSupportedException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.utils.Utils;
 
 import java.net.MalformedURLException;
@@ -12,19 +12,20 @@ public final class TwitchVodLinkHandlerFactory extends TwitchBaseLinkHandlerFact
     // -> Convert to live:<id>
     @Override
     public String getId(final String urlString) throws ParsingException, UnsupportedOperationException {
-        try {
-            final var url = Utils.stringToURL(Utils.removeMAndWWWFromUrl(urlString));
-            final var pathParts = url.getHost().split("/");
-            return new TwitchVodId(pathParts[1]).toString();
-        } catch (MalformedURLException e) {
-            throw new ParsingException("Unable to parse url " + urlString, e);
-        }
+        throw new UnsupportedOperationException();
+//        try {
+//            final var url = Utils.stringToURL(Utils.removeMAndWWWFromUrl(urlString));
+//            final var pathParts = url.getHost().split("/");
+//            return new TwitchVodId(pathParts[1]).toString();
+//        } catch (MalformedURLException e) {
+//            throw new ParsingException("Unable to parse url " + urlString, e);
+//        }
     }
 
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        return buildUrl("videos", TwitchVodId.fromString(id).getVodId());
+        return "";
     }
 
     @Override

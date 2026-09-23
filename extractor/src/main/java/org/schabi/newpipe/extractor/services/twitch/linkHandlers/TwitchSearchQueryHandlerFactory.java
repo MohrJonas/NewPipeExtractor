@@ -2,7 +2,7 @@ package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandlerFactory;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchQueryId;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 
 import java.util.List;
 
@@ -11,6 +11,6 @@ public final class TwitchSearchQueryHandlerFactory extends SearchQueryHandlerFac
     public String getUrl(String query,
                          List<String> contentFilter,
                          String sortFilter) throws ParsingException, UnsupportedOperationException {
-        return new TwitchQueryId(query).toString();
+        return TwitchUrlBuilder.buildSearchUrlFromSearchQuery(query);
     }
 }

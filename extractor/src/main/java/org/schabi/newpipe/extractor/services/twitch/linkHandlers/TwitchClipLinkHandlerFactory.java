@@ -1,7 +1,6 @@
 package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchClipId;
 
 public final class TwitchClipLinkHandlerFactory extends TwitchBaseLinkHandlerFactory {
 
@@ -23,16 +22,18 @@ public final class TwitchClipLinkHandlerFactory extends TwitchBaseLinkHandlerFac
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        return new TwitchClipId(id).toString();
+        //return new TwitchClipId(id).toString();
+        return "";
     }
 
     @Override
     public boolean onAcceptUrl(String url) throws ParsingException {
-        try {
-            TwitchClipId.fromString(url);
-            return true;
-        } catch (AssertionError e) {
-            return false;
-        }
+//        try {
+//            TwitchClipId.fromString(url);
+//            return true;
+//        } catch (AssertionError e) {
+//            return false;
+//        }
+        return false;
     }
 }

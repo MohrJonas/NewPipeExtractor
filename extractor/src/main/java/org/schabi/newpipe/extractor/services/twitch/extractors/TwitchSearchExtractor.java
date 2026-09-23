@@ -14,17 +14,14 @@ import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.SearchQueryHandler;
 import org.schabi.newpipe.extractor.playlist.PlaylistInfoItem;
 import org.schabi.newpipe.extractor.search.SearchExtractor;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.TwitchSearchResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchChannelResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchGameResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchStreamResponseEntry;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.search.types.TwitchSearchVodResponseEntry;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchGameId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchQueryId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -51,7 +48,7 @@ public class TwitchSearchExtractor extends SearchExtractor {
     private static StreamInfoItem buildStreamInfoItem(final int serviceId, final TwitchSearchStreamResponseEntry entry) {
         final var item = new StreamInfoItem(
                 serviceId,
-                new TwitchStreamId(entry.getChannelName()).toString(),
+                TwitchUrlBuilder.buildStreamUrlFromChannelName(entry.getChannelName()),
                 entry.getStreamTitle(),
                 StreamType.LIVE_STREAM
         );
@@ -70,7 +67,7 @@ public class TwitchSearchExtractor extends SearchExtractor {
     private static ChannelInfoItem buildChannelInfoItem(final int serviceId, final TwitchSearchChannelResponseEntry entry) {
         final var item = new ChannelInfoItem(
                 serviceId,
-                new TwitchChannelId(entry.getChannelName()).toString(),
+                TwitchUrlBuilder.buildChannelUrlFromChannelName(entry.getChannelName()),
                 entry.getChannelName()
         );
         item.setThumbnails(List.of(
@@ -82,10 +79,10 @@ public class TwitchSearchExtractor extends SearchExtractor {
         return item;
     }
 
-    private static PlaylistInfoItem buildGameInfoItem(final int serviceId, final TwitchSearchGameResponseEntry entry) {
+    private static PlaylistInfoItem buildCategoryInfoItem(final int serviceId, final TwitchSearchGameResponseEntry entry) {
         final var item = new PlaylistInfoItem(
                 serviceId,
-                new TwitchGameId(entry.getGameName()).toString(),
+                TwitchUrlBuilder.buildCategoryUrlFromCategoryName(entry.getGameName()),
                 entry.getGameName()
         );
         item.setThumbnails(List.of(
@@ -98,7 +95,7 @@ public class TwitchSearchExtractor extends SearchExtractor {
         final var item = new StreamInfoItem(
                 serviceId,
                 // FIXME this should be vodId, not vod title
-                new TwitchVodId(entry.getVodTitle()).toString(),
+                TwitchUrlBuilder.buildVodUrlFromVodId(entry.getVodTitle()),
                 entry.getVodTitle(),
                 StreamType.POST_LIVE_STREAM
         );
@@ -138,13 +135,13 @@ public class TwitchSearchExtractor extends SearchExtractor {
                                 || searchEntry instanceof TwitchSearchVodResponseEntry
                 )
                 .forEach(searchEntry -> {
-                    final var key = searchEntry instanceof TwitchSearchStreamResponseEntry
-                            ? new TwitchStreamId(((TwitchSearchStreamResponseEntry) searchEntry).getChannelName()).toString()
-                            : new TwitchVodId(((TwitchSearchVodResponseEntry) searchEntry).getVodTitle()).toString();
-                    final var value = searchEntry instanceof TwitchSearchStreamResponseEntry
-                            ? buildStreamInfoItem(getServiceId(), (TwitchSearchStreamResponseEntry) searchEntry)
-                            : buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
-                    cache.put(key, value);
+//                    final var key = searchEntry instanceof TwitchSearchStreamResponseEntry
+//                            ? new TwitchStreamId(((TwitchSearchStreamResponseEntry) searchEntry).getChannelName()).toString()
+//                            : new TwitchVodId(((TwitchSearchVodResponseEntry) searchEntry).getVodTitle()).toString();
+//                    final var value = searchEntry instanceof TwitchSearchStreamResponseEntry
+//                            ? buildStreamInfoItem(getServiceId(), (TwitchSearchStreamResponseEntry) searchEntry)
+//                            : buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
+//                    cache.put(key, value);
                 });
         return new InfoItemsPage<>(
                 response.getData()
@@ -157,7 +154,7 @@ public class TwitchSearchExtractor extends SearchExtractor {
                             else if (searchEntry instanceof TwitchSearchVodResponseEntry)
                                 return buildVodInfoItem(getServiceId(), (TwitchSearchVodResponseEntry) searchEntry);
                             else if (searchEntry instanceof TwitchSearchGameResponseEntry)
-                                return buildGameInfoItem(getServiceId(), (TwitchSearchGameResponseEntry) searchEntry);
+                                return buildCategoryInfoItem(getServiceId(), (TwitchSearchGameResponseEntry) searchEntry);
                             else throw new RuntimeException();
                         })
                         .collect(Collectors.toList()),
@@ -174,8 +171,8 @@ public class TwitchSearchExtractor extends SearchExtractor {
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
-            final var queryId = TwitchQueryId.fromString(getUrl());
-            response = TwitchApi.getSearchResponse(downloader, queryId.getQueryString());
+            final var query = TwitchUrlParser.parseQueryFromSearchUrl(getUrl());
+            response = TwitchApi.getSearchResponse(downloader, query);
         } catch (JsonParserException e) {
             throw new IOException(e);
         }

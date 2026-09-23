@@ -11,11 +11,11 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.linkhandler.ReadyChannelTabListLinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 
 import java.io.IOException;
@@ -135,7 +135,8 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
-            channelResponse = TwitchApi.getTwitchChannel(downloader, TwitchChannelId.fromString(getUrl()).getChannelName()).getData();
+            final var channelName = TwitchUrlParser.parseChannelNameFromChannelUrl(getUrl());
+            channelResponse = TwitchApi.getTwitchChannel(downloader, channelName).getData();
         } catch (JsonParserException e) {
             throw new IOException(e);
         }

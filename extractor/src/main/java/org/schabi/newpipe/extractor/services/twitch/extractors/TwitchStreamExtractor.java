@@ -8,11 +8,12 @@ import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchStreamId;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
@@ -53,7 +54,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderUrl() throws ParsingException {
-        return TwitchStreamId.fromString(getUrl()).toString();
+        return TwitchUrlBuilder.buildChannelUrlFromChannelName(getUploaderName());
     }
 
     @Nonnull
@@ -94,11 +95,11 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
-            final var streamId = TwitchStreamId.fromString(getUrl());
-            final var streamInfo = TwitchApi.getStreamInformation(downloader, streamId.getStreamId());
+            final var streamId = TwitchUrlParser.parseChannelNameFromStreamUrl(getUrl());
+            final var streamInfo = TwitchApi.getStreamInformation(downloader, streamId);
             response = streamInfo.getData();
-            final var playbackToken = TwitchApi.getPlaybackToken(downloader, streamId.getStreamId());
-            streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId.getStreamId(), playbackToken.getData().getSignature(), playbackToken.getData().getValue());
+            final var playbackToken = TwitchApi.getPlaybackToken(downloader, streamId);
+            streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId, playbackToken.getData().getSignature(), playbackToken.getData().getValue());
         } catch (JsonParserException e) {
             throw new IOException(e);
         }

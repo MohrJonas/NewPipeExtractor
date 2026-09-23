@@ -12,10 +12,10 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.ListLinkHandler;
 import org.schabi.newpipe.extractor.localization.DateWrapper;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.vod.TwitchVodResponseInner;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchChannelId;
-import org.schabi.newpipe.extractor.services.twitch.data.id.ids.TwitchVodId;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 
@@ -46,7 +46,7 @@ public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
         return new InfoItemsPage<>(Arrays.stream(response).map(res -> {
                     final var item = new StreamInfoItem(
                             getServiceId(),
-                            new TwitchVodId(res.getVodId()).toString(),
+                            TwitchUrlBuilder.buildVodUrlFromVodId(res.getVodId()),
                             res.getVodTitle(),
                             StreamType.POST_LIVE_STREAM
                     );
@@ -69,7 +69,7 @@ public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
                     } catch (ParsingException ignored) {
                     }
                     cache.put(
-                            new TwitchVodId(res.getVodId()).toString(),
+                            TwitchUrlBuilder.buildVodUrlFromVodId(res.getVodId()),
                             item
                     );
                     return item;
@@ -85,8 +85,8 @@ public final class TwitchChannelVodExtractor extends ChannelTabExtractor {
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
-            final var channelId = TwitchChannelId.fromString(getUrl());
-            response = TwitchApi.getTwitchVods(downloader, channelId.getChannelName()).getData();
+            final var channelName = TwitchUrlParser.parseChannelNameFromChannelUrl(getUrl());
+            response = TwitchApi.getTwitchVods(downloader, channelName).getData();
         } catch (JsonParserException e) {
             throw new IOException(e);
         }
