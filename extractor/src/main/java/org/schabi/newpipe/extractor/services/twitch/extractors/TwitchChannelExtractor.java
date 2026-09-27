@@ -104,13 +104,6 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Override
     public List<ListLinkHandler> getTabs() throws ParsingException {
         var tabs = new LinkedList<ListLinkHandler>();
-        if (channelResponse.isLive())
-            tabs.add(new ReadyChannelTabListLinkHandler(
-                    getUrl(),
-                    getId(),
-                    ChannelTabs.LIVESTREAMS,
-                    TwitchChannelStreamExtractor::new
-            ));
         tabs.add(new ReadyChannelTabListLinkHandler(
                 getUrl(),
                 getId(),

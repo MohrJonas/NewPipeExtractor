@@ -38,7 +38,7 @@ public final class TwitchClipResponseInner {
     }
 
     @Nonnull
-    public String getVodThumbnailUrl() {
+    public String getClipThumbnailUrl() {
         return clipThumbnailUrl;
     }
 

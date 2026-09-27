@@ -46,7 +46,7 @@ public abstract class TwitchBaseResponse<T> {
     }
 
     public void ensureSuccess() throws IOException {
-        if (errors == null)
+        if (errors == null || errors.length == 0)
             return;
         var messageString = String.join("; ", errors);
         throw new IOException(messageString);

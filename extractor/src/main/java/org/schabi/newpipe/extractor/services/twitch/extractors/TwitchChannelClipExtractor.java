@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -41,7 +40,7 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
     public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
         return new InfoItemsPage<>(Arrays.stream(response).map(res -> {
             final var item = new StreamInfoItem(getServiceId(), TwitchUrlBuilder.buildClipUrlFromClipId(res.getClipId()), res.getClipTitle(), StreamType.NONE);
-            item.setThumbnails(List.of(new Image(res.getVodThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)));
+            item.setThumbnails(List.of(new Image(res.getClipThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)));
             try {
                 item.setUploaderName(getId() + " + " + res.getClipperName());
             } catch (ParsingException e) {
@@ -49,6 +48,7 @@ public final class TwitchChannelClipExtractor extends ChannelTabExtractor {
             }
             item.setDuration(res.getClipLength());
             item.setViewCount(res.getClipViewerCount());
+            item.setShortFormContent(true);
             item.setShortDescription("(" + res.getClipperName() + "), " + res.getGameName());
             try {
                 item.setUploadDate(DateWrapper.fromInstant(res.getUploadDateTimeString()));
