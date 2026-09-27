@@ -28,21 +28,17 @@ import org.schabi.newpipe.extractor.stream.StreamType;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 public class TwitchSearchExtractor extends SearchExtractor {
 
-    private final Map<String, StreamInfoItem> cache;
     private TwitchSearchResponse response;
 
     public TwitchSearchExtractor(final StreamingService service,
-                                 final SearchQueryHandler linkHandler,
-                                 final Map<String, StreamInfoItem> cache) {
+                                 final SearchQueryHandler linkHandler) {
         super(service, linkHandler);
-        this.cache = cache;
     }
 
     private static StreamInfoItem buildStreamInfoItem(final int serviceId, final TwitchSearchStreamResponseEntry entry) {
@@ -95,7 +91,7 @@ public class TwitchSearchExtractor extends SearchExtractor {
         final var item = new StreamInfoItem(
                 serviceId,
                 // FIXME this should be vodId, not vod title
-                TwitchUrlBuilder.buildVodUrlFromVodId(entry.getVodTitle()),
+                TwitchUrlBuilder.buildVodUrlFromVodId(entry.getVodId()),
                 entry.getVodTitle(),
                 StreamType.POST_LIVE_STREAM
         );

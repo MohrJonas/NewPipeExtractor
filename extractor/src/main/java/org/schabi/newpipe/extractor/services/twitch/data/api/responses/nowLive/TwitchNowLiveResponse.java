@@ -24,15 +24,18 @@ public class TwitchNowLiveResponse extends TwitchBaseResponse<List<TwitchNowLive
         final var nodes = data.getObject("streams").getArray("edges");
         return nodes.streamAsJsonObjects().map(outerNode -> {
                     final var node = outerNode.getObject("node");
-                    final var streamerName = node.getObject("broadcaster").getString("displayName");
+                    final var broadcaster = node.getObject("broadcaster");
+                    final var streamerName = broadcaster.getString("displayName");
+                    final var loginName = broadcaster.getString("login");
                     final var title = node.getString("title");
                     final var viewers = node.getInt("viewersCount");
                     final var gameName = node.getObject("game").getString("name");
                     return new TwitchNowLiveResponseEntry(
                             streamerName,
+                            loginName,
                             title,
                             viewers,
-                            ThumbnailURLGenerator.getThumbnailURLForStream(streamerName),
+                            ThumbnailURLGenerator.getThumbnailURLForStream(loginName),
                             gameName
                     );
                 })

@@ -10,12 +10,14 @@ import org.schabi.newpipe.extractor.exceptions.ExtractionException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
+import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchVideoPlayerMediaSessionManagerResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
-import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 
@@ -23,7 +25,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,14 +32,12 @@ import javax.annotation.Nonnull;
 
 public class TwitchVodExtractor extends StreamExtractor {
 
-    private final Map<String, StreamInfoItem> cache;
     private TwitchVideoStream[] streams;
+    private TwitchVideoPlayerMediaSessionManagerResponseInner twitchVideoPlayerMediaSessionManager;
 
     public TwitchVodExtractor(final StreamingService service,
-                              final LinkHandler linkHandler,
-                              final Map<String, StreamInfoItem> cache) {
+                              final LinkHandler linkHandler) {
         super(service, linkHandler);
-        this.cache = cache;
     }
 
     @Override
@@ -47,6 +46,7 @@ public class TwitchVodExtractor extends StreamExtractor {
             final var token = TwitchApi.getVodPlaybackToken(downloader, getId());
             final var playSessionId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);
             streams = TwitchApi.getM3U8VodPlaybackUrl(downloader, getId(), token.getData().signature(), token.getData().value(), playSessionId);
+            twitchVideoPlayerMediaSessionManager = TwitchApi.getTwitchVideoPlayerMediaSessionManager(downloader, getId()).getData();
         } catch (JsonParserException e) {
             throw new IOException(e);
         }
@@ -55,16 +55,12 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        if (cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getName();
-        return "???";
+        return twitchVideoPlayerMediaSessionManager.getClipTitle();
     }
 
     @Nonnull
     @Override
     public List<Image> getThumbnails() throws ParsingException {
-        if (cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getThumbnails();
         return Collections.emptyList();
     }
 
@@ -77,9 +73,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
-        if (cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getUploaderName();
-        return "???";
+        return twitchVideoPlayerMediaSessionManager.getOwnerDisplayName();
     }
 
     @Override
@@ -96,7 +90,7 @@ public class TwitchVodExtractor extends StreamExtractor {
                                 .setDeliveryMethod(DeliveryMethod.HLS)
                                 .setResolution(res.resolution().asResolutionString())
                                 .setIsVideoOnly(false)
-                                .setMediaFormat(MediaFormat.MP2)
+                                .setMediaFormat(MediaFormat.MPEG_4)
                                 .build()
                 )
                 .collect(Collectors.toList());
@@ -110,9 +104,16 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public List<Image> getUploaderAvatars() throws ParsingException {
-        if (cache.containsKey(getUrl()))
-            return cache.get(getUrl()).getUploaderAvatars();
-        return Collections.emptyList();
+        final var imageSize =
+                TwitchUtils.tryGetImageSizeFromUrl(twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl());
+        final var imageHeight = imageSize.map(ImageSize::imageHeight)
+                .orElse(Image.HEIGHT_UNKNOWN);
+        final var imageWidth = imageSize.map(ImageSize::imageWidth)
+                .orElse(Image.WIDTH_UNKNOWN);
+        final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
+        return List.of(new Image(
+                twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl(),
+                imageHeight, imageWidth, resolutionLevel));
     }
 
     @Override

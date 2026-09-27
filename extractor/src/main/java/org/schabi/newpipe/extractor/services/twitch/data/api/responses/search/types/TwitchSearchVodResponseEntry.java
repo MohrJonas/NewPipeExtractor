@@ -22,13 +22,17 @@ public final class TwitchSearchVodResponseEntry extends TwitchSearchBaseResponse
     @Nonnull
     private final String uploadTimeStampString;
 
-    public TwitchSearchVodResponseEntry(@Nonnull String vodTitle, @Nonnull String channelName, int vodViewCount, int vodDurationInSeconds, @Nonnull String streamThumbnailUrl, @Nonnull String uploadTimeStampString) {
+    @Nonnull
+    private final String vodId;
+
+    public TwitchSearchVodResponseEntry(@Nonnull String vodTitle, @Nonnull String channelName, int vodViewCount, int vodDurationInSeconds, @Nonnull String streamThumbnailUrl, @Nonnull String uploadTimeStampString, @Nonnull String vodId) {
         this.vodTitle = vodTitle;
         this.channelName = channelName;
         this.vodViewCount = vodViewCount;
         this.vodDurationInSeconds = vodDurationInSeconds;
         this.streamThumbnailUrl = streamThumbnailUrl;
         this.uploadTimeStampString = uploadTimeStampString;
+        this.vodId = vodId;
     }
 
     @Nonnull
@@ -57,5 +61,10 @@ public final class TwitchSearchVodResponseEntry extends TwitchSearchBaseResponse
     @Nonnull
     public String getUploadTimeStampString() {
         return uploadTimeStampString;
+    }
+
+    @Nonnull
+    public String getVodId() {
+        return vodId;
     }
 }

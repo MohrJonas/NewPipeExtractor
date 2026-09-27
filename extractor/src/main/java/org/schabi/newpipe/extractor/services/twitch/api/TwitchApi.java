@@ -15,6 +15,8 @@ import org.schabi.newpipe.extractor.services.twitch.data.api.TwitchResponseParse
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchVideoPlayerMediaSessionManagerResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchVideoPlayerMediaSessionManagerResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.nowLive.TwitchNowLiveResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchStreamPlaybackTokenResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.playbackToken.TwitchVodPlaybackTokenResponse;
@@ -34,9 +36,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 public final class TwitchApi {
 
-    private static final String CLIENT_ID = "ue6666qo983tsx6so1t0vnawi233wa";
+    private static final String CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
     private static final String TWITCH_QGL_URL = "https://gql.twitch.tv/gql";
     private static final String TWITCH_USHER_URL = "https://usher.ttvnw.net";
 
@@ -188,7 +192,7 @@ public final class TwitchApi {
             final var line = lineQueue.pop();
             if (line.startsWith("#")) commentBuffer.add(line);
             else {
-                final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+x\\d+)");
+                final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+)x(\\d+)");
                 Resolution resolution = null;
                 for (final var bufferedLine : commentBuffer) {
                     final var matcher = resolutionPattern.matcher(bufferedLine);
@@ -207,5 +211,14 @@ public final class TwitchApi {
             }
         }
         return streams.toArray(TwitchVideoStream[]::new);
+    }
+
+    public static TwitchVideoPlayerMediaSessionManagerResponse getTwitchVideoPlayerMediaSessionManager(@Nonnull final Downloader downloader, @Nonnull final String vodId) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getVideoPlayerMediaSessionManagerTemplate(vodId)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchVideoPlayerMediaSessionManagerResponse.class);
+        response.ensureSuccess();
+        return response;
     }
 }

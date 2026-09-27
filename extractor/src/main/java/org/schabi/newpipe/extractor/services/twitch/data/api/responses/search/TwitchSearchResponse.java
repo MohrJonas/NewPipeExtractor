@@ -33,12 +33,27 @@ public final class TwitchSearchResponse extends TwitchBaseResponse<List<TwitchSe
     private static @Nonnull TwitchSearchStreamResponseEntry parseAsStreamEntry(JsonObject node) {
         final var item = node.getObject("item");
         final var stream = item.getObject("stream");
-        return new TwitchSearchStreamResponseEntry(item.getString("displayName"), item.getObject("broadcastSettings").getString("title"), stream.getInt("viewersCount"), ThumbnailURLGenerator.getThumbnailURLForStream(item.getString("displayName")), stream.getObject("game").getString("name"), item.getString("profileImageURL"));
+        return new TwitchSearchStreamResponseEntry(
+                item.getString("displayName"),
+                item.getObject("broadcastSettings").getString("title"),
+                stream.getInt("viewersCount"),
+                ThumbnailURLGenerator.getThumbnailURLForStream(item.getString("login")),
+                stream.getObject("game").getString("name"),
+                item.getString("profileImageURL")
+        );
     }
 
     private static @Nonnull TwitchSearchVodResponseEntry parseAsVodEntry(JsonObject node) {
         final var item = node.getObject("item");
-        return new TwitchSearchVodResponseEntry(item.getString("title"), item.getObject("owner").getString("displayName"), item.getInt("viewCount"), item.getInt("lengthSeconds"), item.getString("previewThumbnailURL"), item.getString("createdAt"));
+        return new TwitchSearchVodResponseEntry(
+                item.getString("title"),
+                item.getObject("owner").getString("displayName"),
+                item.getInt("viewCount"),
+                item.getInt("lengthSeconds"),
+                item.getString("previewThumbnailURL"),
+                item.getString("createdAt"),
+                item.getString("id")
+            );
     }
 
     private static @Nonnull TwitchSearchGameResponseEntry parseAsGameEntry(JsonObject node) {

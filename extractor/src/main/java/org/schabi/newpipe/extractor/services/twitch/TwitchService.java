@@ -53,7 +53,7 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public SearchExtractor getSearchExtractor(SearchQueryHandler queryHandler) {
-        return new TwitchSearchExtractor(this, queryHandler, streamInfoCache);
+        return new TwitchSearchExtractor(this, queryHandler);
     }
 
     @Override
@@ -146,7 +146,7 @@ public final class TwitchService extends StreamingService {
         }
         try {
             TwitchUrlParser.parseVodIdFromVodUrl(url);
-            return new TwitchVodExtractor(this, linkHandler, streamInfoCache);
+            return new TwitchVodExtractor(this, linkHandler);
         } catch (Exception ignored) {
         }
         throw new ExtractionException("Cannot get StreamExtractor for url " + url);

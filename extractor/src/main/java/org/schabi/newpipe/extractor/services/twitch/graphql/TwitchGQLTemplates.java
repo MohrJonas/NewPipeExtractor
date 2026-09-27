@@ -20,6 +20,7 @@ public final class TwitchGQLTemplates {
     private static final String STREAMER_TEMPLATE = "{\"query\": \"{\\n" +
             "  user(login: \\\"%s\\\") {\\n" +
             "    displayName\\n" +
+            "    login\\n" +
             "    stream {\\n" +
             "      title\\n" +
             "      viewersCount\\n" +
@@ -54,6 +55,7 @@ public final class TwitchGQLTemplates {
             "            viewersCount\\n" +
             "            broadcaster {\\n" +
             "                displayName\\n" +
+            "                login\\n" +
             "            }\\n" +
             "            game {\\n" +
             "                name\\n" +
@@ -177,6 +179,28 @@ public final class TwitchGQLTemplates {
             "        }\n" +
             "    }\n" +
             "}";
+
+    private static final String MEDIA_SESSION_MANAGER_TEMPLATE = "{\n" +
+    "    \"operationName\": \"VideoPlayerMediaSessionManager\",\n" +
+    "    \"variables\": {\n" +
+    "        \"clipSlug\": \"\",\n" +
+    "        \"isClip\": false,\n" +
+    "        \"isLive\": false,\n" +
+    "        \"isVodOrCollection\": true,\n" +
+    "        \"vodID\": \"%s\"\n" +
+    "    },\n" +
+    "    \"extensions\": {\n" +
+    "        \"persistedQuery\": {\n" +
+    "            \"version\": 1,\n" +
+    "            \"sha256Hash\": \"694c36677896425624f1293c9cb5aa4d08ed813993cf84c80d13d9380721fda2\"\n" +
+    "        }\n" +
+    "    }\n" +
+    "}";
+    ;
+
+    public static String getVideoPlayerMediaSessionManagerTemplate(final String vodId) {
+        return String.format(MEDIA_SESSION_MANAGER_TEMPLATE, vodId);
+    }
 
     public static String getPlaybackAccessTokenTemplate(final String channelName) {
         return String.format(STREAM_PLAYBACK_ACCESS_TOKEN_TEMPLATE, channelName);
