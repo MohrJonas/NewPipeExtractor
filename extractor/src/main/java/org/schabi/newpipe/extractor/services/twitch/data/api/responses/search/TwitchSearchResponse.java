@@ -71,7 +71,7 @@ public final class TwitchSearchResponse extends TwitchBaseResponse<List<TwitchSe
         channels.ifPresent(objects -> masterList.addAll(objects.streamAsJsonObjects().map(obj -> {
             final var isLive = obj.getObject("item").getObject("stream").has("viewersCount");
             return isLive ? parseAsStreamEntry(obj) : parseAsChannelEntry(obj);
-        }).collect(Collectors.toList())));
+        }).toList()));
         games.ifPresent(objects ->
                 masterList.addAll(objects.streamAsJsonObjects().map(TwitchSearchResponse::parseAsGameEntry).collect(Collectors.toList())));
         vods.ifPresent(objects ->

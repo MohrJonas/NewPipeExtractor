@@ -18,10 +18,11 @@ public final class TwitchStreamResponse extends TwitchBaseResponse<TwitchStreamR
     protected TwitchStreamResponseInner ParseData(final JsonObject data) {
         final var user = data.getObject("user");
         final var streamerName = user.getString("displayName");
+        final var loginName = user.getString("login");
         final var stream = user.getObject("stream");
         final var streamTitle = stream.getString("title");
         final var viewerCount = stream.getInt("viewersCount");
         final var createdAtString = stream.getString("createdAt");
-        return new TwitchStreamResponseInner(streamerName, streamTitle, viewerCount, createdAtString);
+        return new TwitchStreamResponseInner(streamerName, loginName, streamTitle, viewerCount, createdAtString);
     }
 }

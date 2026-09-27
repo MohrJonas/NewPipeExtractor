@@ -15,6 +15,7 @@ import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
@@ -33,8 +34,9 @@ import javax.annotation.Nonnull;
 
 public class TwitchStreamExtractor extends StreamExtractor {
 
-    private TwitchStreamResponseInner response;
+    private TwitchStreamResponseInner streamResponse;
     private TwitchVideoStream[] streams;
+    private TwitchChannelResponseInner channelResponse;
 
     public TwitchStreamExtractor(final StreamingService service,
                                  final LinkHandler linkHandler) {
@@ -56,8 +58,20 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Override
     public List<Image> getThumbnails() throws ParsingException {
         return List.of(
-                new Image(ThumbnailURLGenerator.getThumbnailURLForStream(response.streamerName()), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
+                new Image(ThumbnailURLGenerator.getThumbnailURLForStream(streamResponse.streamerName()), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
         );
+    }
+
+    @Nonnull
+    @Override
+    public List<Image> getUploaderAvatars() throws ParsingException {
+        return List.of(
+            new Image(
+                channelResponse.streamerAvatarUrl(),
+                Image.HEIGHT_UNKNOWN,
+                Image.WIDTH_UNKNOWN,
+                Image.ResolutionLevel.UNKNOWN
+            ));
     }
 
     @Nonnull
@@ -75,7 +89,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
-        return response.streamerName();
+        return streamResponse.streamerName();
     }
 
     @Override
@@ -113,7 +127,8 @@ public class TwitchStreamExtractor extends StreamExtractor {
         try {
             final var streamId = TwitchUrlParser.parseChannelNameFromStreamUrl(getUrl());
             final var streamInfo = TwitchApi.getStreamInformation(downloader, streamId);
-            response = streamInfo.getData();
+            streamResponse = streamInfo.getData();
+            channelResponse = TwitchApi.getTwitchChannel(downloader, streamResponse.streamerLoginName()).getData();
             final var playbackToken = TwitchApi.getPlaybackToken(downloader, streamId);
             streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId, playbackToken.getData().signature(), playbackToken.getData().value());
         } catch (JsonParserException e) {
@@ -124,6 +139,6 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        return response.streamTitle();
+        return streamResponse.streamTitle();
     }
 }

@@ -55,7 +55,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        return twitchVideoPlayerMediaSessionManager.getClipTitle();
+        return twitchVideoPlayerMediaSessionManager.clipTitle();
     }
 
     @Nonnull
@@ -73,7 +73,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
-        return twitchVideoPlayerMediaSessionManager.getOwnerDisplayName();
+        return twitchVideoPlayerMediaSessionManager.ownerDisplayName();
     }
 
     @Override
@@ -105,14 +105,14 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Override
     public List<Image> getUploaderAvatars() throws ParsingException {
         final var resolution =
-                TwitchUtils.tryGetResolutionFromUrl(twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl());
+                TwitchUtils.tryGetResolutionFromUrl(twitchVideoPlayerMediaSessionManager.ownerProfileImageUrl());
         final var imageHeight = resolution.map(Resolution::height)
                 .orElse(Image.HEIGHT_UNKNOWN);
         final var imageWidth = resolution.map(Resolution::width)
                 .orElse(Image.WIDTH_UNKNOWN);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(new Image(
-                twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl(),
+                twitchVideoPlayerMediaSessionManager.ownerProfileImageUrl(),
                 imageHeight, imageWidth, resolutionLevel));
     }
 
