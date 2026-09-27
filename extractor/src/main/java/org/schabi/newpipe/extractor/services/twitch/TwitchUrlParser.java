@@ -10,8 +10,7 @@ import javax.annotation.Nonnull;
 
 public final class TwitchUrlParser {
 
-    private static void ensureIsCorrectBaseUrl(@Nonnull final String urlString)
-    {
+    private static void ensureIsCorrectBaseUrl(@Nonnull final String urlString) {
         Assertions.assertThat(() -> Utils.removeMAndWWWFromUrl(urlString).startsWith(TwitchService.BaseUrl));
     }
 

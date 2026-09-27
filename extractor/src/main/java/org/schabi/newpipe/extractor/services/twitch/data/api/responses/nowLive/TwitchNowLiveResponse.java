@@ -36,7 +36,7 @@ public class TwitchNowLiveResponse extends TwitchBaseResponse<List<TwitchNowLive
                             gameName
                     );
                 })
-                .sorted(Comparator.comparing(TwitchNowLiveResponseEntry::getStreamViewers).reversed())
+                .sorted(Comparator.comparing(TwitchNowLiveResponseEntry::streamViewers).reversed())
                 .collect(Collectors.toList());
     }
 }

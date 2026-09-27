@@ -41,14 +41,14 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Override
     public List<Image> getAvatars() throws ParsingException {
         final var imageSize =
-                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.getStreamerAvatarUrl());
-        final var imageHeight = imageSize.map(ImageSize::getImageHeight)
+                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.streamerAvatarUrl());
+        final var imageHeight = imageSize.map(ImageSize::imageHeight)
                 .orElse(Image.HEIGHT_UNKNOWN);
-        final var imageWidth = imageSize.map(ImageSize::getImageWidth)
+        final var imageWidth = imageSize.map(ImageSize::imageWidth)
                 .orElse(Image.WIDTH_UNKNOWN);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
-                new Image(channelResponse.getStreamerAvatarUrl(), imageHeight, imageWidth, resolutionLevel)
+                new Image(channelResponse.streamerAvatarUrl(), imageHeight, imageWidth, resolutionLevel)
         );
     }
 
@@ -56,14 +56,14 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Override
     public List<Image> getBanners() throws ParsingException {
         final var imageSize =
-                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.getChannelBannerUrl());
-        final var imageHeight = imageSize.map(ImageSize::getImageHeight)
+                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.channelBannerUrl());
+        final var imageHeight = imageSize.map(ImageSize::imageHeight)
                 .orElse(480);
-        final var imageWidth = imageSize.map(ImageSize::getImageWidth)
+        final var imageWidth = imageSize.map(ImageSize::imageWidth)
                 .orElse(1200);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
-                new Image(channelResponse.getChannelBannerUrl(), imageHeight, imageWidth, resolutionLevel)
+                new Image(channelResponse.channelBannerUrl(), imageHeight, imageWidth, resolutionLevel)
         );
     }
 
@@ -74,12 +74,12 @@ public class TwitchChannelExtractor extends ChannelExtractor {
 
     @Override
     public long getSubscriberCount() throws ParsingException {
-        return channelResponse.getFollowerCount();
+        return channelResponse.followerCount();
     }
 
     @Override
     public String getDescription() throws ParsingException {
-        return channelResponse.getStreamerDescription();
+        return channelResponse.streamerDescription();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class TwitchChannelExtractor extends ChannelExtractor {
                 getId(),
                 ChannelTabs.SHORTS,
                 (service, linkHandler) ->
-                    new TwitchChannelClipExtractor(service, linkHandler, cache)
+                        new TwitchChannelClipExtractor(service, linkHandler, cache)
         ));
         return tabs;
     }
@@ -145,6 +145,6 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        return channelResponse.getChannelName();
+        return channelResponse.channelName();
     }
 }

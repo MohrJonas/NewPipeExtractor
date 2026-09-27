@@ -46,7 +46,7 @@ public class TwitchVodExtractor extends StreamExtractor {
         try {
             final var token = TwitchApi.getVodPlaybackToken(downloader, getId());
             final var playSessionId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);
-            streams = TwitchApi.getM3U8VodPlaybackUrl(downloader, getId(), token.getData().getSignature(), token.getData().getValue(), playSessionId);
+            streams = TwitchApi.getM3U8VodPlaybackUrl(downloader, getId(), token.getData().signature(), token.getData().value(), playSessionId);
         } catch (JsonParserException e) {
             throw new IOException(e);
         }
@@ -55,7 +55,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        if(cache.containsKey(getUrl()))
+        if (cache.containsKey(getUrl()))
             return cache.get(getUrl()).getName();
         return "???";
     }
@@ -63,7 +63,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public List<Image> getThumbnails() throws ParsingException {
-        if(cache.containsKey(getUrl()))
+        if (cache.containsKey(getUrl()))
             return cache.get(getUrl()).getThumbnails();
         return Collections.emptyList();
     }
@@ -77,7 +77,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
-        if(cache.containsKey(getUrl()))
+        if (cache.containsKey(getUrl()))
             return cache.get(getUrl()).getUploaderName();
         return "???";
     }
@@ -92,9 +92,9 @@ public class TwitchVodExtractor extends StreamExtractor {
         return Arrays.stream(streams).map(res ->
                         new VideoStream.Builder()
                                 .setId(VideoStream.ID_UNKNOWN)
-                                .setContent(res.getStreamUrl(), true)
+                                .setContent(res.streamUrl(), true)
                                 .setDeliveryMethod(DeliveryMethod.HLS)
-                                .setResolution(res.getResolution())
+                                .setResolution(res.resolution().asResolutionString())
                                 .setIsVideoOnly(false)
                                 .setMediaFormat(MediaFormat.MP2)
                                 .build()
@@ -110,7 +110,7 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public List<Image> getUploaderAvatars() throws ParsingException {
-        if(cache.containsKey(getUrl()))
+        if (cache.containsKey(getUrl()))
             return cache.get(getUrl()).getUploaderAvatars();
         return Collections.emptyList();
     }

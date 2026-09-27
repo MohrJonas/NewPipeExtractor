@@ -9,6 +9,7 @@ import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ReCaptchaException;
 import org.schabi.newpipe.extractor.services.twitch.StringUtils;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
+import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.TwitchResponseParser;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponse;
@@ -43,7 +44,6 @@ public final class TwitchApi {
 
     public static TwitchSearchResponse getSearchResponse(final Downloader downloader, final String query) throws IOException, ReCaptchaException, JsonParserException {
         final var requestId = UUID.randomUUID().toString();
-        final var rawRequest = TwitchGQLTemplates.getSearchResult(requestId, query);
         final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getSearchResult(requestId, query)));
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
@@ -80,51 +80,35 @@ public final class TwitchApi {
     }
 
     public static TwitchVideoStream[] getM3U8PlaybackUrl(final Downloader downloader, final String channelName, final String playbackTokenSignature, final String playbackTokenValue) throws IOException, ReCaptchaException {
-        final var masterM3U8Url = TWITCH_USHER_URL + "/api/channel/hls/" + channelName + ".m3u8?allow_source=true&allow_audio_only=false&allow_spectre=true&p=1003155&platform=web&player=twitchweb&supported_codecs=av1,h265,h264&playlist_include_framerate=false&sig=" + playbackTokenSignature + "&token=" + URLEncoder.encode(playbackTokenValue, Charset.defaultCharset());
+        final var masterM3U8Url = TWITCH_USHER_URL + "/api/v2/channel/hls/" + channelName + ".m3u8?allow_source=true&allow_audio_only=false&allow_spectre=true&p=1003155&platform=web&player=twitchweb&supported_codecs=av1,h265,h264&playlist_include_framerate=false&sig=" + playbackTokenSignature + "&token=" + URLEncoder.encode(playbackTokenValue, Charset.defaultCharset());
         final var response = downloader.get(masterM3U8Url);
         final var content = response.responseBody();
-        final var lineQueue = new ArrayDeque<String>(List.of(content.split("\n")));
+        final var lineQueue = new ArrayDeque<>(List.of(content.split("\n")));
         final var commentBuffer = new ArrayList<String>();
         final var streams = new ArrayList<TwitchVideoStream>();
         while (!lineQueue.isEmpty()) {
             final var line = lineQueue.pop();
             if (line.startsWith("#")) commentBuffer.add(line);
             else {
-                final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+x\\d+)");
-                String resolution = null;
+                final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+)x(\\d+)");
+                Resolution resolution = null;
                 for (final var bufferedLine : commentBuffer) {
                     final var matcher = resolutionPattern.matcher(bufferedLine);
-                    if (matcher.find()) resolution = matcher.group(1);
+                    if (matcher.find()) resolution = new Resolution(
+                            Integer.parseInt(matcher.group(1)),
+                            Integer.parseInt(matcher.group(2))
+                    );
                 }
-                if (resolution != null) streams.add(new TwitchVideoStream(resolution, line));
+                if (resolution != null)
+                    streams.add(new TwitchVideoStream(
+                            resolution,
+                            line,
+                            UUID.randomUUID().toString()
+                    ));
                 commentBuffer.clear();
             }
         }
         return streams.toArray(TwitchVideoStream[]::new);
-//        var usedStream = streamArray[0];
-//        final var adM3U8 = downloader.get(usedStream.getStreamUrl()).responseBody();
-//        final var pattern = Pattern.compile("X-TV-TWITCH-TRIGGER-URL=\"(.*)\"");
-//        final var sessionIdPattern = Pattern.compile("X-TV-TWITCH-SESSIONID=\"(.*)\"");
-//        final var matcher = pattern.matcher(adM3U8);
-//        final var sessionMatcher = sessionIdPattern.matcher(adM3U8);
-//        if (!matcher.find()) {
-//            return new TwitchVideoStream[]{usedStream};
-//        }
-//        String sessionId = null;
-//        if (sessionMatcher.find()) sessionId = sessionMatcher.group(1);
-//        var tokenUrl = matcher.group(1);
-//        try {
-//            Thread.sleep(20000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        var ret = downloader.get(tokenUrl, Map.of("X-TV-TWITCH-SESSIONID", List.of(sessionId)));
-//        var neww = downloader.get(usedStream.getStreamUrl(), Map.of("X-TV-TWITCH-SESSIONID", List.of(sessionId))).responseBody();
-//        return new TwitchVideoStream[]{usedStream};
-//        var urls = Arrays.stream(lines)
-//            .filter(line -> !line.startsWith("#"))
-//                .collect(Collectors.toList());
-//        return urls.get(urls.size() - 1);
     }
 
     public static TwitchChannelResponse getTwitchChannel(final Downloader downloader, final String channelName) throws IOException, ReCaptchaException, JsonParserException {
@@ -197,7 +181,7 @@ public final class TwitchApi {
         final var masterM3U8Url = TWITCH_USHER_URL + "/vod/v2/" + vodId + ".m3u8?acmb=eyJBcHBWZXJzaW9uIjoiMTFhYmE4MTYtZThlMi00M2MyLWJmOWUtNTNkMTNiM2EyYWEyIiwiQ2xpZW50QXBwIjoid2ViIn0%3D&allow_source=true&enable_score=true&include_unavailable=false&lang=en&multigroup_video=false&p=4876112&platform=web&player_backend=mediaplayer&play_session_id=" + sessionId + "&player_version=1.50.0-rc.4&playlist_include_framerate=true&reassignments_supported=true&sig=" + playbackTokenSignature + "&token=" + URLEncoder.encode(playbackTokenValue, Charset.defaultCharset());
         final var response = downloader.get(masterM3U8Url);
         final var content = response.responseBody();
-        final var lineQueue = new ArrayDeque<String>(List.of(content.split("\n")));
+        final var lineQueue = new ArrayDeque<>(List.of(content.split("\n")));
         final var commentBuffer = new ArrayList<String>();
         final var streams = new ArrayList<TwitchVideoStream>();
         while (!lineQueue.isEmpty()) {
@@ -205,12 +189,20 @@ public final class TwitchApi {
             if (line.startsWith("#")) commentBuffer.add(line);
             else {
                 final var resolutionPattern = Pattern.compile("RESOLUTION=(\\d+x\\d+)");
-                String resolution = null;
+                Resolution resolution = null;
                 for (final var bufferedLine : commentBuffer) {
                     final var matcher = resolutionPattern.matcher(bufferedLine);
-                    if (matcher.find()) resolution = matcher.group(1);
+                    if (matcher.find()) resolution = new Resolution(
+                            Integer.parseInt(matcher.group(1)),
+                            Integer.parseInt(matcher.group(2))
+                    );
                 }
-                if (resolution != null) streams.add(new TwitchVideoStream(resolution, line));
+                if (resolution != null)
+                    streams.add(new TwitchVideoStream(
+                            resolution,
+                            line,
+                            UUID.randomUUID().toString()
+                    ));
                 commentBuffer.clear();
             }
         }

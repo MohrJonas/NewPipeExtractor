@@ -58,19 +58,19 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
     public InfoItemsPage<StreamInfoItem> getInitialPage() throws IOException, ExtractionException {
         response.getData()
                 .forEach(searchEntry -> {
-                    final var key = TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName());
+                    final var key = TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.streamerName());
                     final var value = new StreamInfoItem(
                             getServiceId(),
-                            TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName()),
-                            searchEntry.getStreamTitle(),
+                            TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.streamerName()),
+                            searchEntry.streamTitle(),
                             StreamType.LIVE_STREAM
                     );
-                    value.setViewCount(searchEntry.getStreamViewers());
-                    value.setUploaderName(searchEntry.getStreamerName());
-                    value.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.getStreamerName()));
-                    value.setShortDescription(searchEntry.getGameName());
-                    value.setUploaderAvatars(List.of(new Image(searchEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
-                    value.setThumbnails(List.of(new Image(searchEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
+                    value.setViewCount(searchEntry.streamViewers());
+                    value.setUploaderName(searchEntry.streamerName());
+                    value.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(searchEntry.streamerName()));
+                    value.setShortDescription(searchEntry.gameName());
+                    value.setUploaderAvatars(List.of(new Image(searchEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
+                    value.setThumbnails(List.of(new Image(searchEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
                     cache.put(key, value);
                 });
         return new InfoItemsPage<>(
@@ -79,16 +79,16 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
                         .map(liveEntry -> {
                             final var infoItem = new StreamInfoItem(
                                     getServiceId(),
-                                    TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.getStreamerName()),
-                                    liveEntry.getStreamTitle(),
+                                    TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.streamerName()),
+                                    liveEntry.streamTitle(),
                                     StreamType.LIVE_STREAM
                             );
-                            infoItem.setViewCount(liveEntry.getStreamViewers());
-                            infoItem.setUploaderName(liveEntry.getStreamerName());
-                            infoItem.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.getStreamerName()));
-                            infoItem.setShortDescription(liveEntry.getGameName());
-                            infoItem.setUploaderAvatars(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
-                            infoItem.setThumbnails(List.of(new Image(liveEntry.getThumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
+                            infoItem.setViewCount(liveEntry.streamViewers());
+                            infoItem.setUploaderName(liveEntry.streamerName());
+                            infoItem.setUploaderUrl(TwitchUrlBuilder.buildStreamUrlFromChannelName(liveEntry.streamerName()));
+                            infoItem.setShortDescription(liveEntry.gameName());
+                            infoItem.setUploaderAvatars(List.of(new Image(liveEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
+                            infoItem.setThumbnails(List.of(new Image(liveEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
                             return infoItem;
                         })
                         .collect(Collectors.toList()),

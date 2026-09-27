@@ -3,6 +3,7 @@ package org.schabi.newpipe.extractor.services.twitch.extractors;
 import com.grack.nanojson.JsonParserException;
 
 import org.schabi.newpipe.extractor.Image;
+import org.schabi.newpipe.extractor.MediaFormat;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.downloader.Downloader;
 import org.schabi.newpipe.extractor.exceptions.ExtractionException;
@@ -12,43 +13,57 @@ import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
+import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
-import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 public class TwitchStreamExtractor extends StreamExtractor {
 
-    private final Map<String, StreamInfoItem> cache;
     private TwitchStreamResponseInner response;
     private TwitchVideoStream[] streams;
 
     public TwitchStreamExtractor(final StreamingService service,
-                                 final LinkHandler linkHandler,
-                                 final Map<String, StreamInfoItem> cache) {
+                                 final LinkHandler linkHandler) {
         super(service, linkHandler);
-        this.cache = cache;
+    }
+
+    private static int getResolutionPixelCount(Resolution resolution) {
+        return resolution.width() * resolution.height();
+    }
+
+    @Nonnull
+    private static TwitchVideoStream GetStreamWithHighestResolution(TwitchVideoStream[] streams) {
+        return Arrays.stream(streams)
+                .max(Comparator.comparingInt(twitchVideoStream ->
+                        getResolutionPixelCount(twitchVideoStream.resolution()))).get();
     }
 
     @Nonnull
     @Override
     public List<Image> getThumbnails() throws ParsingException {
         return List.of(
-                new Image(ThumbnailURLGenerator.getThumbnailURLForStream(response.getStreamerName()), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
+                new Image(ThumbnailURLGenerator.getThumbnailURLForStream(response.streamerName()), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN)
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getHlsUrl() {
+        return GetStreamWithHighestResolution(streams).streamUrl();
     }
 
     @Nonnull
@@ -60,7 +75,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getUploaderName() throws ParsingException {
-        return response.getStreamerName();
+        return response.streamerName();
     }
 
     @Override
@@ -72,10 +87,11 @@ public class TwitchStreamExtractor extends StreamExtractor {
     public List<VideoStream> getVideoStreams() throws IOException, ExtractionException {
         return Arrays.stream(streams).map(str ->
                         new VideoStream.Builder()
-                                .setId(VideoStream.ID_UNKNOWN)
-                                .setContent(str.getStreamUrl(), true)
+                                .setMediaFormat(MediaFormat.MPEG_4)
+                                .setId(str.name())
+                                .setContent(str.streamUrl(), true)
                                 .setDeliveryMethod(DeliveryMethod.HLS)
-                                .setResolution(str.getResolution())
+                                .setResolution(str.resolution().asResolutionString())
                                 .setIsVideoOnly(false)
                                 .build()
                 )
@@ -99,7 +115,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
             final var streamInfo = TwitchApi.getStreamInformation(downloader, streamId);
             response = streamInfo.getData();
             final var playbackToken = TwitchApi.getPlaybackToken(downloader, streamId);
-            streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId, playbackToken.getData().getSignature(), playbackToken.getData().getValue());
+            streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId, playbackToken.getData().signature(), playbackToken.getData().value());
         } catch (JsonParserException e) {
             throw new IOException(e);
         }
@@ -108,6 +124,6 @@ public class TwitchStreamExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public String getName() throws ParsingException {
-        return response.getStreamTitle();
+        return response.streamTitle();
     }
 }

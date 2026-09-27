@@ -11,8 +11,7 @@ public class TwitchStreamLinkHandlerFactory extends TwitchBaseLinkHandlerFactory
 
     @Override
     public String getId(final String urlString) throws ParsingException, UnsupportedOperationException {
-        switch (type)
-        {
+        switch (type) {
             case CLIP:
                 return TwitchUrlParser.parseClipIdFromClipUrl(urlString);
             case STREAM:
@@ -25,8 +24,7 @@ public class TwitchStreamLinkHandlerFactory extends TwitchBaseLinkHandlerFactory
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        switch (type)
-        {
+        switch (type) {
             case CLIP:
                 return TwitchUrlBuilder.buildClipUrlFromClipId(id);
             case STREAM:
@@ -39,25 +37,24 @@ public class TwitchStreamLinkHandlerFactory extends TwitchBaseLinkHandlerFactory
 
     @Override
     public boolean onAcceptUrl(final String urlString) throws ParsingException {
-        try
-        {
+        try {
             TwitchUrlParser.parseClipIdFromClipUrl(urlString);
             type = TwitchStreamLinkType.CLIP;
             return true;
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         try {
             TwitchUrlParser.parseVodIdFromVodUrl(urlString);
             type = TwitchStreamLinkType.VOD;
             return true;
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         try {
             TwitchUrlParser.parseChannelNameFromStreamUrl(urlString);
             type = TwitchStreamLinkType.STREAM;
             return true;
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         return false;
     }
 }

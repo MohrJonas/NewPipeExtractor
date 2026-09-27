@@ -1,20 +1,5 @@
 package org.schabi.newpipe.extractor.services.twitch.data;
 
-public final class ImageSize {
+public record ImageSize(int imageWidth, int imageHeight) {
 
-    private final int imageWidth;
-    private final int imageHeight;
-
-    public ImageSize(int imageWidth, int imageHeight) {
-        this.imageWidth = imageWidth;
-        this.imageHeight = imageHeight;
-    }
-
-    public int getImageWidth() {
-        return imageWidth;
-    }
-
-    public int getImageHeight() {
-        return imageHeight;
-    }
 }

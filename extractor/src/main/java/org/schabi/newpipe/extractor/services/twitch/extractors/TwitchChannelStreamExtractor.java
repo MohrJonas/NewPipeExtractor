@@ -37,16 +37,16 @@ public final class TwitchChannelStreamExtractor extends ChannelTabExtractor {
     public InfoItemsPage<InfoItem> getInitialPage() throws IOException, ExtractionException {
         var item = new StreamInfoItem(
                 getServiceId(),
-                TwitchUrlBuilder.buildChannelUrlFromChannelName(response.getStreamerName()),
-                response.getStreamTitle(),
+                TwitchUrlBuilder.buildStreamUrlFromChannelName(response.streamerName()),
+                response.streamTitle(),
                 StreamType.LIVE_STREAM
         );
-        item.setUploaderName(response.getStreamerName());
-        item.setViewCount(response.getViewerCount());
-        item.setUploadDate(DateWrapper.fromInstant(response.getCreatedDateString()));
+        item.setUploaderName(response.streamerName());
+        item.setViewCount(response.viewerCount());
+        item.setUploadDate(DateWrapper.fromInstant(response.createdDateString()));
         item.setThumbnails(
                 List.of(new Image(
-                        ThumbnailURLGenerator.getThumbnailURLForStream(response.getStreamerName()),
+                        ThumbnailURLGenerator.getThumbnailURLForStream(response.streamerName()),
                         Image.HEIGHT_UNKNOWN,
                         Image.WIDTH_UNKNOWN,
                         Image.ResolutionLevel.UNKNOWN)));
@@ -62,8 +62,7 @@ public final class TwitchChannelStreamExtractor extends ChannelTabExtractor {
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
         try {
             response = TwitchApi.getStreamInformation(downloader, getId()).getData();
-        }
-        catch (JsonParserException e) {
+        } catch (JsonParserException e) {
             throw new IOException(e);
         }
     }

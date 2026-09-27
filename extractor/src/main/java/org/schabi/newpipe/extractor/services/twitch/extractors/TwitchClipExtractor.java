@@ -77,9 +77,9 @@ public final class TwitchClipExtractor extends StreamExtractor {
         return Arrays.stream(clipResponse).map(res ->
                 new VideoStream.Builder()
                         .setId(VideoStream.ID_UNKNOWN)
-                        .setContent(res.getClipUrl(), true)
+                        .setContent(res.clipUrl(), true)
                         .setDeliveryMethod(DeliveryMethod.PROGRESSIVE_HTTP)
-                        .setResolution(res.getClipWidth() + "x" + res.getClipHeight())
+                        .setResolution(res.clipWidth() + "x" + res.clipHeight())
                         .setIsVideoOnly(false)
                         .setMediaFormat(MediaFormat.MPEG_4)
                         .build()

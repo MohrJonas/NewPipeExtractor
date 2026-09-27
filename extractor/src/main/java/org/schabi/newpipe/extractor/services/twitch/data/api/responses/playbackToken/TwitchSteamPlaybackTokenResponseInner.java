@@ -2,26 +2,7 @@ package org.schabi.newpipe.extractor.services.twitch.data.api.responses.playback
 
 import javax.annotation.Nonnull;
 
-public final class TwitchSteamPlaybackTokenResponseInner {
+public record TwitchSteamPlaybackTokenResponseInner(@Nonnull String signature,
+                                                    @Nonnull String value) {
 
-    @Nonnull
-    private final String signature;
-
-    @Nonnull
-    private final String value;
-
-    public TwitchSteamPlaybackTokenResponseInner(@Nonnull String signature, @Nonnull String value) {
-        this.signature = signature;
-        this.value = value;
-    }
-
-    @Nonnull
-    public String getSignature() {
-        return signature;
-    }
-
-    @Nonnull
-    public String getValue() {
-        return value;
-    }
 }

@@ -136,19 +136,19 @@ public final class TwitchService extends StreamingService {
         final var url = linkHandler.getUrl();
         try {
             TwitchUrlParser.parseChannelNameFromStreamUrl(url);
-            return new TwitchStreamExtractor(this, linkHandler, streamInfoCache);
+            return new TwitchStreamExtractor(this, linkHandler);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         try {
             TwitchUrlParser.parseClipIdFromClipUrl(url);
             return new TwitchClipExtractor(this, linkHandler, streamInfoCache);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         try {
             TwitchUrlParser.parseVodIdFromVodUrl(url);
             return new TwitchVodExtractor(this, linkHandler, streamInfoCache);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         throw new ExtractionException("Cannot get StreamExtractor for url " + url);
     }
 

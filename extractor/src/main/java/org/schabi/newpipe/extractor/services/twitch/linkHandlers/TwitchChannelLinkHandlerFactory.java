@@ -22,14 +22,11 @@ public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactor
 
     @Override
     public boolean onAcceptUrl(String urlString) throws ParsingException {
-        try
-        {
+        try {
             var channelName = TwitchUrlParser.parseChannelNameFromChannelUrl(urlString);
             Objects.requireNonNull(channelName);
             return true;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
     }

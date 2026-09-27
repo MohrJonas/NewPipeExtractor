@@ -1,6 +1,5 @@
 package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
-import org.schabi.newpipe.extractor.exceptions.ContentNotSupportedException;
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.utils.Utils;
 
