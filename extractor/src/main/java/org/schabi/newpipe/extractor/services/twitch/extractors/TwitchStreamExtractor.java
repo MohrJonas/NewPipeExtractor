@@ -88,7 +88,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
         return Arrays.stream(streams).map(str ->
                         new VideoStream.Builder()
                                 .setMediaFormat(MediaFormat.MPEG_4)
-                                .setId(str.name())
+                                .setId(VideoStream.ID_UNKNOWN)
                                 .setContent(str.streamUrl(), true)
                                 .setDeliveryMethod(DeliveryMethod.HLS)
                                 .setResolution(str.resolution().asResolutionString())
@@ -100,7 +100,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
 
     @Override
     public List<VideoStream> getVideoOnlyStreams() throws IOException, ExtractionException {
-        return null;
+        return List.of();
     }
 
     @Override

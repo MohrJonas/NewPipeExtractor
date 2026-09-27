@@ -106,8 +106,7 @@ public final class TwitchApi {
                 if (resolution != null)
                     streams.add(new TwitchVideoStream(
                             resolution,
-                            line,
-                            UUID.randomUUID().toString()
+                            line
                     ));
                 commentBuffer.clear();
             }
@@ -204,8 +203,7 @@ public final class TwitchApi {
                 if (resolution != null)
                     streams.add(new TwitchVideoStream(
                             resolution,
-                            line,
-                            UUID.randomUUID().toString()
+                            line
                     ));
                 commentBuffer.clear();
             }

@@ -14,7 +14,7 @@ import org.schabi.newpipe.extractor.linkhandler.ReadyChannelTabListLinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
-import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
+import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
 import org.schabi.newpipe.extractor.stream.StreamInfoItem;
 
@@ -27,24 +27,21 @@ import javax.annotation.Nonnull;
 
 public class TwitchChannelExtractor extends ChannelExtractor {
 
-    private final Map<String, StreamInfoItem> cache;
     private TwitchChannelResponseInner channelResponse;
 
     public TwitchChannelExtractor(final StreamingService service,
-                                  final ListLinkHandler linkHandler,
-                                  final Map<String, StreamInfoItem> cache) {
+                                  final ListLinkHandler linkHandler) {
         super(service, linkHandler);
-        this.cache = cache;
     }
 
     @Nonnull
     @Override
     public List<Image> getAvatars() throws ParsingException {
-        final var imageSize =
-                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.streamerAvatarUrl());
-        final var imageHeight = imageSize.map(ImageSize::imageHeight)
+        final var resolution =
+                TwitchUtils.tryGetResolutionFromUrl(channelResponse.streamerAvatarUrl());
+        final var imageHeight = resolution.map(Resolution::height)
                 .orElse(Image.HEIGHT_UNKNOWN);
-        final var imageWidth = imageSize.map(ImageSize::imageWidth)
+        final var imageWidth = resolution.map(Resolution::width)
                 .orElse(Image.WIDTH_UNKNOWN);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
@@ -55,11 +52,11 @@ public class TwitchChannelExtractor extends ChannelExtractor {
     @Nonnull
     @Override
     public List<Image> getBanners() throws ParsingException {
-        final var imageSize =
-                TwitchUtils.tryGetImageSizeFromUrl(channelResponse.channelBannerUrl());
-        final var imageHeight = imageSize.map(ImageSize::imageHeight)
+        final var resolution =
+                TwitchUtils.tryGetResolutionFromUrl(channelResponse.channelBannerUrl());
+        final var imageHeight = resolution.map(Resolution::height)
                 .orElse(480);
-        final var imageWidth = imageSize.map(ImageSize::imageWidth)
+        final var imageWidth = resolution.map(Resolution::width)
                 .orElse(1200);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(
@@ -118,16 +115,14 @@ public class TwitchChannelExtractor extends ChannelExtractor {
                 getUrl(),
                 getId(),
                 ChannelTabs.VIDEOS,
-                (service, linkHandler) ->
-                        new TwitchChannelVodExtractor(service, linkHandler, cache)
+                TwitchChannelVodExtractor::new
         ));
         // Clips are not really shorts, but probably still the best fit ¯\_(ツ)_/¯
         tabs.add(new ReadyChannelTabListLinkHandler(
                 getUrl(),
                 getId(),
                 ChannelTabs.SHORTS,
-                (service, linkHandler) ->
-                        new TwitchChannelClipExtractor(service, linkHandler, cache)
+                TwitchChannelClipExtractor::new
         ));
         return tabs;
     }

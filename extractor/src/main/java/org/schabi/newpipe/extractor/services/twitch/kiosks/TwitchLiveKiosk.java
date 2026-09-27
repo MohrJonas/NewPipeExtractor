@@ -27,15 +27,12 @@ import javax.annotation.Nonnull;
 public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
 
     public static final String KIOSK_ID = "live";
-    private final Map<String, StreamInfoItem> cache;
 
     private TwitchNowLiveResponse response;
 
     public TwitchLiveKiosk(final StreamingService streamingService,
-                           final ListLinkHandler linkHandler,
-                           final Map<String, StreamInfoItem> cache) {
+                           final ListLinkHandler linkHandler) {
         super(streamingService, linkHandler, KIOSK_ID);
-        this.cache = cache;
     }
 
     @Override
@@ -71,7 +68,6 @@ public class TwitchLiveKiosk extends KioskExtractor<StreamInfoItem> {
                     value.setShortDescription(searchEntry.gameName());
                     value.setUploaderAvatars(List.of(new Image(searchEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.LOW)));
                     value.setThumbnails(List.of(new Image(searchEntry.thumbnailUrl(), Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.MEDIUM)));
-                    cache.put(key, value);
                 });
         return new InfoItemsPage<>(
                 response.getData()

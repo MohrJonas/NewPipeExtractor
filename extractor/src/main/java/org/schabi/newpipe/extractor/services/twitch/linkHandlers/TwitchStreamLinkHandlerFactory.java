@@ -1,38 +1,31 @@
 package org.schabi.newpipe.extractor.services.twitch.linkHandlers;
 
 import org.schabi.newpipe.extractor.exceptions.ParsingException;
+import org.schabi.newpipe.extractor.linkhandler.LinkHandlerFactory;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchStreamLinkType;
 
-public class TwitchStreamLinkHandlerFactory extends TwitchBaseLinkHandlerFactory {
+public class TwitchStreamLinkHandlerFactory extends LinkHandlerFactory {
 
     private TwitchStreamLinkType type;
 
     @Override
     public String getId(final String urlString) throws ParsingException, UnsupportedOperationException {
-        switch (type) {
-            case CLIP:
-                return TwitchUrlParser.parseClipIdFromClipUrl(urlString);
-            case STREAM:
-                return TwitchUrlParser.parseChannelNameFromStreamUrl(urlString);
-            case VOD:
-                return TwitchUrlParser.parseVodIdFromVodUrl(urlString);
-        }
-        throw new UnsupportedOperationException("Unsupported .getId call for stream type " + type);
+        return switch (type) {
+            case CLIP -> TwitchUrlParser.parseClipIdFromClipUrl(urlString);
+            case STREAM -> TwitchUrlParser.parseChannelNameFromStreamUrl(urlString);
+            case VOD -> TwitchUrlParser.parseVodIdFromVodUrl(urlString);
+        };
     }
 
     @Override
     public String getUrl(final String id) throws ParsingException, UnsupportedOperationException {
-        switch (type) {
-            case CLIP:
-                return TwitchUrlBuilder.buildClipUrlFromClipId(id);
-            case STREAM:
-                return TwitchUrlBuilder.buildStreamUrlFromChannelName(id);
-            case VOD:
-                return TwitchUrlBuilder.buildVodUrlFromVodId(id);
-        }
-        throw new UnsupportedOperationException("Unsupported .getId call for stream type " + type);
+        return switch (type) {
+            case CLIP -> TwitchUrlBuilder.buildClipUrlFromClipId(id);
+            case STREAM -> TwitchUrlBuilder.buildStreamUrlFromChannelName(id);
+            case VOD -> TwitchUrlBuilder.buildVodUrlFromVodId(id);
+        };
     }
 
     @Override

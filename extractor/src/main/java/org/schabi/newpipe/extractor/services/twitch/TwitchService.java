@@ -40,8 +40,6 @@ public final class TwitchService extends StreamingService {
 
     public static final String BaseUrl = "https://twitch.tv";
 
-    private final Map<String, StreamInfoItem> streamInfoCache = new HashMap<>();
-
     public TwitchService(final int id) {
         super(id, "Twitch", EnumSet.of(LIVE));
     }
@@ -102,7 +100,7 @@ public final class TwitchService extends StreamingService {
             final var list = new KioskList(this);
             final var streamHandler = new TwitchLiveKioskLinkHandlerFactory();
             list.addKioskEntry((streamingService, url, kioskId) ->
-                            new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url), streamInfoCache),
+                            new TwitchLiveKiosk(streamingService, streamHandler.fromUrl(url)),
                     streamHandler,
                     TwitchLiveKiosk.KIOSK_ID
             );
@@ -115,7 +113,7 @@ public final class TwitchService extends StreamingService {
 
     @Override
     public ChannelExtractor getChannelExtractor(ListLinkHandler linkHandler) throws ExtractionException {
-        return new TwitchChannelExtractor(this, linkHandler, streamInfoCache);
+        return new TwitchChannelExtractor(this, linkHandler);
     }
 
     @Override
@@ -141,7 +139,7 @@ public final class TwitchService extends StreamingService {
         }
         try {
             TwitchUrlParser.parseClipIdFromClipUrl(url);
-            return new TwitchClipExtractor(this, linkHandler, streamInfoCache);
+            return new TwitchClipExtractor(this, linkHandler);
         } catch (Exception ignored) {
         }
         try {

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 
 public final class TwitchChannelLinkHandlerFactory extends ListLinkHandlerFactory {
-
     @Override
     public String getId(String url) throws ParsingException, UnsupportedOperationException {
         return TwitchUrlParser.parseChannelNameFromChannelUrl(url);

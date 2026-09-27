@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 
 public record TwitchVideoStream(
         @Nonnull Resolution resolution,
-        @Nonnull String streamUrl,
-        @Nonnull String name
+        @Nonnull String streamUrl
 ) {
 }

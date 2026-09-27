@@ -12,7 +12,7 @@ import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
-import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
+import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchVideoPlayerMediaSessionManagerResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
@@ -104,11 +104,11 @@ public class TwitchVodExtractor extends StreamExtractor {
     @Nonnull
     @Override
     public List<Image> getUploaderAvatars() throws ParsingException {
-        final var imageSize =
-                TwitchUtils.tryGetImageSizeFromUrl(twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl());
-        final var imageHeight = imageSize.map(ImageSize::imageHeight)
+        final var resolution =
+                TwitchUtils.tryGetResolutionFromUrl(twitchVideoPlayerMediaSessionManager.getOwnerProfileImageUrl());
+        final var imageHeight = resolution.map(Resolution::height)
                 .orElse(Image.HEIGHT_UNKNOWN);
-        final var imageWidth = imageSize.map(ImageSize::imageWidth)
+        final var imageWidth = resolution.map(Resolution::width)
                 .orElse(Image.WIDTH_UNKNOWN);
         final var resolutionLevel = Image.ResolutionLevel.fromHeight(imageHeight);
         return List.of(new Image(

@@ -1,6 +1,6 @@
 package org.schabi.newpipe.extractor.services.twitch;
 
-import org.schabi.newpipe.extractor.services.twitch.data.ImageSize;
+import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -17,11 +17,11 @@ public final class TwitchUtils {
         return code >= 200 && code < 300;
     }
 
-    public static Optional<ImageSize> tryGetImageSizeFromUrl(final String url) {
+    public static Optional<Resolution> tryGetResolutionFromUrl(final String url) {
         final var matcher = imageSizePattern.matcher(url);
         if (matcher.find())
             return Optional.of(
-                    new ImageSize(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)))
+                    new Resolution(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)))
             );
         return Optional.empty();
     }

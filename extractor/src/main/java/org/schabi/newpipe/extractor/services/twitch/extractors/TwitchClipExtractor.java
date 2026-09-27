@@ -29,15 +29,11 @@ import javax.annotation.Nonnull;
 
 public final class TwitchClipExtractor extends StreamExtractor {
 
-    private final Map<String, StreamInfoItem> cache;
     private TwitchClipPlaybackResponseInner[] clipResponse;
 
     public TwitchClipExtractor(final StreamingService service,
-                               final LinkHandler linkHandler,
-                               final Map<String, StreamInfoItem> cache) {
-        super(service, linkHandler);
-        this.cache = cache;
-    }
+                               final LinkHandler linkHandler) {
+        super(service, linkHandler);}
 
     @Override
     public void onFetchPage(@Nonnull Downloader downloader) throws IOException, ExtractionException {
