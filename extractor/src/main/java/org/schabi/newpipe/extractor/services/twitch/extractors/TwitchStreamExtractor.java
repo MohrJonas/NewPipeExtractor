@@ -3,6 +3,9 @@ package org.schabi.newpipe.extractor.services.twitch.extractors;
 import com.grack.nanojson.JsonParserException;
 
 import org.schabi.newpipe.extractor.Image;
+import org.schabi.newpipe.extractor.InfoItem;
+import org.schabi.newpipe.extractor.InfoItemExtractor;
+import org.schabi.newpipe.extractor.InfoItemsCollector;
 import org.schabi.newpipe.extractor.MediaFormat;
 import org.schabi.newpipe.extractor.StreamingService;
 import org.schabi.newpipe.extractor.downloader.Downloader;
@@ -11,15 +14,20 @@ import org.schabi.newpipe.extractor.exceptions.ParsingException;
 import org.schabi.newpipe.extractor.linkhandler.LinkHandler;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlBuilder;
 import org.schabi.newpipe.extractor.services.twitch.TwitchUrlParser;
+import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.api.ThumbnailURLGenerator;
 import org.schabi.newpipe.extractor.services.twitch.api.TwitchApi;
 import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.TwitchSideNavResponse;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.TwitchSideNavResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponseInner;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.stream.TwitchStreamResponseInner;
 import org.schabi.newpipe.extractor.stream.AudioStream;
 import org.schabi.newpipe.extractor.stream.DeliveryMethod;
 import org.schabi.newpipe.extractor.stream.StreamExtractor;
+import org.schabi.newpipe.extractor.stream.StreamInfoItem;
+import org.schabi.newpipe.extractor.stream.StreamInfoItemsCollector;
 import org.schabi.newpipe.extractor.stream.StreamType;
 import org.schabi.newpipe.extractor.stream.VideoStream;
 
@@ -31,12 +39,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TwitchStreamExtractor extends StreamExtractor {
 
     private TwitchStreamResponseInner streamResponse;
     private TwitchVideoStream[] streams;
     private TwitchChannelResponseInner channelResponse;
+    private TwitchSideNavResponseInner[] sideNavResponses;
 
     public TwitchStreamExtractor(final StreamingService service,
                                  final LinkHandler linkHandler) {
@@ -97,6 +107,32 @@ public class TwitchStreamExtractor extends StreamExtractor {
         return Collections.emptyList();
     }
 
+    @Nullable
+    @Override
+    public InfoItemsCollector<? extends InfoItem, ? extends InfoItemExtractor> getRelatedItems() throws IOException, ExtractionException {
+        return new StreamInfoItemsCollector(getServiceId())
+        {
+            @Override
+            public List<StreamInfoItem> getItems() {
+                return Arrays.stream(sideNavResponses).map(res -> {
+                    var item = new StreamInfoItem(
+                            getServiceId(),
+                            TwitchUrlBuilder.buildStreamUrlFromChannelName(res.streamerLoginName()),
+                            res.title(),
+                            StreamType.VIDEO_STREAM
+                        );
+                    item.setUploaderName(res.streamerName());
+                    item.setThumbnails(List.of(new Image(
+                        ThumbnailURLGenerator.getThumbnailURLForStream(res.streamerLoginName()),
+                        Image.HEIGHT_UNKNOWN, Image.WIDTH_UNKNOWN, Image.ResolutionLevel.UNKNOWN
+                    )));
+
+                    return item;
+                }).toList();
+            }
+        };
+    }
+
     @Override
     public List<VideoStream> getVideoStreams() throws IOException, ExtractionException {
         return Arrays.stream(streams).map(str ->
@@ -129,6 +165,7 @@ public class TwitchStreamExtractor extends StreamExtractor {
             final var streamInfo = TwitchApi.getStreamInformation(downloader, streamId);
             streamResponse = streamInfo.getData();
             channelResponse = TwitchApi.getTwitchChannel(downloader, streamResponse.streamerLoginName()).getData();
+            sideNavResponses = TwitchApi.getTwitchSideNavResponse(downloader, streamResponse.streamerLoginName()).getData();
             final var playbackToken = TwitchApi.getPlaybackToken(downloader, streamId);
             streams = TwitchApi.getM3U8PlaybackUrl(downloader, streamId, playbackToken.getData().signature(), playbackToken.getData().value());
         } catch (JsonParserException e) {

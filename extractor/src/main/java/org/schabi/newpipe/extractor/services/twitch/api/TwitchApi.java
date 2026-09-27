@@ -12,6 +12,7 @@ import org.schabi.newpipe.extractor.services.twitch.TwitchUtils;
 import org.schabi.newpipe.extractor.services.twitch.data.Resolution;
 import org.schabi.newpipe.extractor.services.twitch.data.TwitchVideoStream;
 import org.schabi.newpipe.extractor.services.twitch.data.api.TwitchResponseParser;
+import org.schabi.newpipe.extractor.services.twitch.data.api.responses.TwitchSideNavResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.channel.TwitchChannelResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipPlaybackResponse;
 import org.schabi.newpipe.extractor.services.twitch.data.api.responses.clip.TwitchClipResponse;
@@ -216,6 +217,15 @@ public final class TwitchApi {
         if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
             throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
         final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchVideoPlayerMediaSessionManagerResponse.class);
+        response.ensureSuccess();
+        return response;
+    }
+
+    public static TwitchSideNavResponse getTwitchSideNavResponse(@Nonnull final Downloader downloader, @Nonnull final String channelName) throws IOException, ReCaptchaException, JsonParserException {
+        final var rawResponse = downloader.post(TWITCH_QGL_URL, DEFAULT_HEADERS, StringUtils.stringToBytes(TwitchGQLTemplates.getSideNavTemplate(channelName)));
+        if (!TwitchUtils.isSuccessfulResponseCode(rawResponse.responseCode()))
+            throw new ResponseCodeIsNotSuccessException(rawResponse.responseCode());
+        final var response = TwitchResponseParser.parseFromJson(JsonParser.object().from(rawResponse.responseBody()), TwitchSideNavResponse.class);
         response.ensureSuccess();
         return response;
     }

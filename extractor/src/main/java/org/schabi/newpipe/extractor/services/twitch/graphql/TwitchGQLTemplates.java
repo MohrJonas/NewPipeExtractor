@@ -28,23 +28,24 @@ public final class TwitchGQLTemplates {
             "  }\\n" +
             "}\"}";
 
-    private static final String SEARCH_TEMPLATE = "[\n" +
-            "    {\n" +
-            "        \"operationName\": \"SearchResultsPage_SearchResults\",\n" +
-            "        \"variables\": {\n" +
-            "            \"requestID\": \"%s\",\n" +
-            "            \"query\": \"%s\",\n" +
-            "            \"platform\": \"web\",\n" +
-            "            \"options\": { \"targets\": null, \"shouldSkipDiscoveryControl\": false }\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"a7c600111acc4d1b294eafa364600556227939e2ff88505faa73035b57a83b22\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "]";
+    private static final String SEARCH_TEMPLATE = """
+            [
+                {
+                    "operationName": "SearchResultsPage_SearchResults",
+                    "variables": {
+                        "requestID": "%s",
+                        "query": "%s",
+                        "platform": "web",
+                        "options": { "targets": null, "shouldSkipDiscoveryControl": false }
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "a7c600111acc4d1b294eafa364600556227939e2ff88505faa73035b57a83b22"
+                        }
+                    }
+                }
+            ]""";
 
     private static final String NOW_LIVE_TEMPLATE = "{\"query\":\"{\\n" +
             "    streams(first: 25) {\\n" +
@@ -65,138 +66,185 @@ public final class TwitchGQLTemplates {
             "    }\\n" +
             "}\"}";
 
-    private static final String CHANNEL_TEMPLATE = "[\n" +
-            "    {\n" +
-            "        \"operationName\": \"HomeOfflineCarousel\",\n" +
-            "        \"variables\": {\n" +
-            "            \"channelLogin\": \"%s\",\n" +
-            "            \"includeTrailerUpsell\": false,\n" +
-            "            \"trailerUpsellVideoID\": \"601752619\"\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"0409584bcabf718836bf330c29d0ac9d9a58f9674f7684bcbfce1a3e8dcf93b2\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"operationName\": \"ChannelAvatar\",\n" +
-            "        \"variables\": {\n" +
-            "            \"channelLogin\": \"%s\"\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"db0e7b54c5e75fcf7874cafca2dacde646344cbbd1a80a2488a7953176c87a68\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    },\n" +
-            "    {\n" +
-            "        \"operationName\": \"ChannelShell\",\n" +
-            "        \"variables\": {\n" +
-            "            \"login\": \"%s\"\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"fea4573a7bf2644f5b3f2cbbdcbee0d17312e48d2e55f080589d053aad353f11\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "]";
+    private static final String CHANNEL_TEMPLATE = """
+            [
+                {
+                    "operationName": "HomeOfflineCarousel",
+                    "variables": {
+                        "channelLogin": "%s",
+                        "includeTrailerUpsell": false,
+                        "trailerUpsellVideoID": "601752619"
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "0409584bcabf718836bf330c29d0ac9d9a58f9674f7684bcbfce1a3e8dcf93b2"
+                        }
+                    }
+                },
+                {
+                    "operationName": "ChannelAvatar",
+                    "variables": {
+                        "channelLogin": "%s"
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "db0e7b54c5e75fcf7874cafca2dacde646344cbbd1a80a2488a7953176c87a68"
+                        }
+                    }
+                },
+                {
+                    "operationName": "ChannelShell",
+                    "variables": {
+                        "login": "%s"
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "fea4573a7bf2644f5b3f2cbbdcbee0d17312e48d2e55f080589d053aad353f11"
+                        }
+                    }
+                }
+            ]""";
 
-    private static final String VOD_TEMPLATE = "[\n" +
-            "    {\n" +
-            "        \"operationName\": \"FilterableVideoTower_Videos\",\n" +
-            "        \"variables\": {\n" +
-            "            \"includePreviewBlur\": false,\n" +
-            "            \"limit\": 30,\n" +
-            "            \"channelOwnerLogin\": \"%s\",\n" +
-            "            \"broadcastType\": null,\n" +
-            "            \"videoSort\": \"TIME\"\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"67004f7881e65c297936f32c75246470629557a393788fb5a69d6d9a25a8fd5f\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "]";
+    private static final String VOD_TEMPLATE = """
+            [
+                {
+                    "operationName": "FilterableVideoTower_Videos",
+                    "variables": {
+                        "includePreviewBlur": false,
+                        "limit": 30,
+                        "channelOwnerLogin": "%s",
+                        "broadcastType": null,
+                        "videoSort": "TIME"
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "67004f7881e65c297936f32c75246470629557a393788fb5a69d6d9a25a8fd5f"
+                        }
+                    }
+                }
+            ]""";
 
-    private static final String CLIP_TEMPLATE = "[\n" +
-            "    {\n" +
-            "        \"operationName\": \"ClipsCards__User\",\n" +
-            "        \"variables\": {\n" +
-            "            \"login\": \"%s\",\n" +
-            "            \"limit\": 20,\n" +
-            "            \"criteria\": {\n" +
-            "                \"filter\": \"ALL_TIME\",\n" +
-            "                \"shouldFilterByDiscoverySetting\": true\n" +
-            "            },\n" +
-            "            \"cursor\": null\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"1cd671bfa12cec480499c087319f26d21925e9695d1f80225aae6a4354f23088\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "]";
+    private static final String CLIP_TEMPLATE = """
+            [
+                {
+                    "operationName": "ClipsCards__User",
+                    "variables": {
+                        "login": "%s",
+                        "limit": 20,
+                        "criteria": {
+                            "filter": "ALL_TIME",
+                            "shouldFilterByDiscoverySetting": true
+                        },
+                        "cursor": null
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "1cd671bfa12cec480499c087319f26d21925e9695d1f80225aae6a4354f23088"
+                        }
+                    }
+                }
+            ]""";
 
-    private static final String CLIP_PLAYBACK_ACCESS_TOKEN = "[\n" +
-            "    {\n" +
-            "        \"operationName\": \"VideoAccessToken_Clip\",\n" +
-            "        \"variables\": {\n" +
-            "            \"platform\": \"web\",\n" +
-            "            \"slug\": \"%s\"\n" +
-            "        },\n" +
-            "        \"extensions\": {\n" +
-            "            \"persistedQuery\": {\n" +
-            "                \"version\": 1,\n" +
-            "                \"sha256Hash\": \"4f35f1ac933d76b1da008c806cd5546a7534dfaff83e033a422a81f24e5991b3\"\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "]";
+    private static final String CLIP_PLAYBACK_ACCESS_TOKEN = """
+            [
+                {
+                    "operationName": "VideoAccessToken_Clip",
+                    "variables": {
+                        "platform": "web",
+                        "slug": "%s"
+                    },
+                    "extensions": {
+                        "persistedQuery": {
+                            "version": 1,
+                            "sha256Hash": "4f35f1ac933d76b1da008c806cd5546a7534dfaff83e033a422a81f24e5991b3"
+                        }
+                    }
+                }
+            ]""";
 
-    private static final String VOD_PLAYBACK_ACCESS_TOKEN = "{\n" +
-            "    \"operationName\": \"PlaybackAccessToken\",\n" +
-            "    \"variables\": {\n" +
-            "        \"isLive\": false,\n" +
-            "        \"login\": \"\",\n" +
-            "        \"isVod\": true,\n" +
-            "        \"vodID\": \"%s\",\n" +
-            "        \"playerType\": \"site\",\n" +
-            "        \"platform\": \"web\"\n" +
-            "    },\n" +
-            "    \"extensions\": {\n" +
-            "        \"persistedQuery\": {\n" +
-            "            \"version\": 1,\n" +
-            "            \"sha256Hash\": \"ed230aa1e33e07eebb8928504583da78a5173989fadfb1ac94be06a04f3cdbe9\"\n" +
-            "        }\n" +
-            "    }\n" +
-            "}";
+    private static final String VOD_PLAYBACK_ACCESS_TOKEN = """
+            {
+                "operationName": "PlaybackAccessToken",
+                "variables": {
+                    "isLive": false,
+                    "login": "",
+                    "isVod": true,
+                    "vodID": "%s",
+                    "playerType": "site",
+                    "platform": "web"
+                },
+                "extensions": {
+                    "persistedQuery": {
+                        "version": 1,
+                        "sha256Hash": "ed230aa1e33e07eebb8928504583da78a5173989fadfb1ac94be06a04f3cdbe9"
+                    }
+                }
+            }""";
 
-    private static final String MEDIA_SESSION_MANAGER_TEMPLATE = "{\n" +
-    "    \"operationName\": \"VideoPlayerMediaSessionManager\",\n" +
-    "    \"variables\": {\n" +
-    "        \"clipSlug\": \"\",\n" +
-    "        \"isClip\": false,\n" +
-    "        \"isLive\": false,\n" +
-    "        \"isVodOrCollection\": true,\n" +
-    "        \"vodID\": \"%s\"\n" +
-    "    },\n" +
-    "    \"extensions\": {\n" +
-    "        \"persistedQuery\": {\n" +
-    "            \"version\": 1,\n" +
-    "            \"sha256Hash\": \"694c36677896425624f1293c9cb5aa4d08ed813993cf84c80d13d9380721fda2\"\n" +
-    "        }\n" +
-    "    }\n" +
-    "}";
-    ;
+    private static final String MEDIA_SESSION_MANAGER_TEMPLATE = """
+            {
+                "operationName": "VideoPlayerMediaSessionManager",
+                "variables": {
+                    "clipSlug": "",
+                    "isClip": false,
+                    "isLive": false,
+                    "isVodOrCollection": true,
+                    "vodID": "%s"
+                },
+                "extensions": {
+                    "persistedQuery": {
+                        "version": 1,
+                        "sha256Hash": "694c36677896425624f1293c9cb5aa4d08ed813993cf84c80d13d9380721fda2"
+                    }
+                }
+            }""";
+
+    private static final String SIDE_NAV_TEMPLATE = """
+            {
+                "operationName": "SideNav",
+                "variables": {
+                    "creatorAnniversariesFeature": false,
+                    "withFreeformTags": false,
+                    "input": {
+                        "contextChannelName": "%s",\
+                        "recommendationContext": {\
+                            "categorySlug" : null,\
+                            "channelName" : "%s",\
+                            "clientApp" : "twilight",\
+                            "lastCategorySlug" : null,\
+                            "lastChannelName" : "%s",\
+                            "location": "channel",\
+                            "pageviewContent" : "similar_channels",\
+                            "pageviewContentType" : null,\
+                            "pageviewLocation" : "channel",\
+                            "pageviewMedium" : "twitch_socialcolumn",\
+                            "platform" : "web",\
+                            "previousPageviewContent" : null,\
+                            "previousPageviewContentType" : null,\
+                            "previousPageviewLocation" : "channel",\
+                            "previousPageviewMedium" : null,\
+                            "referrerDomain": "www.twitch.tv",\
+                            "viewportHeight": 1286,\
+                            "viewportWidth": 2560\
+                        }
+                    }
+                },
+                "extensions": {
+                    "persistedQuery": {
+                        "version": 1,
+                        "sha256Hash": "7984456538921edc68de00b6822e733fb31132d5f2e79818910caf8e7532a85b"
+                    }
+                }
+            }""";
+
+    public static String getSideNavTemplate(final String channelName) {
+        return String.format(SIDE_NAV_TEMPLATE, channelName, channelName, channelName);
+    }
 
     public static String getVideoPlayerMediaSessionManagerTemplate(final String vodId) {
         return String.format(MEDIA_SESSION_MANAGER_TEMPLATE, vodId);
